@@ -7,11 +7,13 @@ A space for me to learn cuda for a path tracing project (c++).
 ## Program flow
 
 1. Input (JSON) containing tris, verts, materials and other scene data via tcp
-2. Start async cuda render job
+2. Start async cuda render job (path tracing)
 3. As pixels finish, send them over a udp connection indexed by frame number & position
 4. Client can handle the pixels received
 
 ## Stack
+
+- CMake + Ninja for build tools
 
 - asio for udp
 

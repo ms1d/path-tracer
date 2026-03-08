@@ -1,0 +1,8 @@
+/home/mahad/Projects/cudaTest/build/CMakeFiles/cudaTest.dir
+/home/mahad/Projects/cudaTest/build/CMakeFiles/edit_cache.dir
+/home/mahad/Projects/cudaTest/build/CMakeFiles/rebuild_cache.dir
+/home/mahad/Projects/cudaTest/build/lib/CMakeFiles/edit_cache.dir
+/home/mahad/Projects/cudaTest/build/lib/CMakeFiles/rebuild_cache.dir
+/home/mahad/Projects/cudaTest/build/lib/test/CMakeFiles/test.dir
+/home/mahad/Projects/cudaTest/build/lib/test/CMakeFiles/edit_cache.dir
+/home/mahad/Projects/cudaTest/build/lib/test/CMakeFiles/rebuild_cache.dir

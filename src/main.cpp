@@ -1,7 +1,7 @@
 #include <iostream>
+#include "test.h"
 
-int main()
-{
-	std::cout << "Hello world!" << "\n";
+int main() {
+	std::cout << SayHello() << "\n";
 	return 0;
 }

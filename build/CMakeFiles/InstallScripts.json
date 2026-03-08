@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/mahad/Projects/cudaTest/build/cmake_install.cmake",
+		"/home/mahad/Projects/cudaTest/build/lib/cmake_install.cmake",
+		"/home/mahad/Projects/cudaTest/build/lib/test/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
