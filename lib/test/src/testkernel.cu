@@ -1,9 +1,8 @@
 #include "testkernel.h"
 #include <cmath>
-#include <cstdlib>
-#include <ctime>
+#include <curand_kernel.h>
 
-__global__ void kernel(float* A, float* B, float* C, const int arrLength) {
+__global__ void addNums(float* A, float* B, float* C, const int arrLength) {
 	int id = threadIdx.x + blockDim.x * blockIdx.x;
 
 	if (id >= arrLength) return;
@@ -11,10 +10,20 @@ __global__ void kernel(float* A, float* B, float* C, const int arrLength) {
 	C[id] = A[id] + B[id];
 }
 
+__global__ void initArray(float* arr, const int arrLength, unsigned long seed) {
+	int id = threadIdx.x + blockDim.x * blockIdx.x;
+	if (id > arrLength) return;
+
+	curandState state;
+	curand_init(seed, id, 0, &state);
+
+	arr[id] = curand_uniform(&state);
+}
+
 
 // Basic function which adds numbers via a cuda kernel
 testResult launchTest() {
-	const int arrLength = 409600;
+	const int arrLength = 4096;
 	const int threads = 256;
 
 	float* A = nullptr;
@@ -24,17 +33,13 @@ testResult launchTest() {
 	cudaMallocManaged(&A, arrLength*sizeof(float));
     cudaMallocManaged(&B, arrLength*sizeof(float));
     cudaMallocManaged(&C, arrLength*sizeof(float));
-	
-	// Basic initialisation of arrays
-	srand(time(0));
-	for (int i = 0; i < arrLength; i++) {
-		A[i] = i * rand() % 10001 / 3.14159f;
-		B[i] = i * rand() % 10001 / 2.71828f;
-	}
 
 	int blocks = ceil((float)arrLength / threads);
 
-	kernel<<<blocks, threads>>>(A, B, C, arrLength);
+	long seed = 102746194;
+	initArray<<<blocks, threads>>>(A, arrLength, seed);
+	initArray<<<blocks, threads>>>(B, arrLength, seed << 27);
+	addNums<<<blocks, threads>>>(A, B, C, arrLength);
 
     cudaDeviceSynchronize();
 
