@@ -21,4 +21,13 @@ struct vec3 {
 
 		// Dot product
 		float operator*(const vec3& other) const;
+
+		// Scalar Multiplication
+		friend vec3 operator*(const vec3& v, float scalar) {
+			return vec3(v.x * scalar, v.y * scalar, v.z * scalar);
+		}
+		
+		friend vec3 operator*(float scalar, const vec3& v) {
+			return v * scalar;
+		}
 };
