@@ -19,6 +19,7 @@
 template<size_t dim>
 struct vec {
 	public:
+		static_assert(dim > 1, "Vector dimensions must be > 1");
 		float data[dim];
 
 

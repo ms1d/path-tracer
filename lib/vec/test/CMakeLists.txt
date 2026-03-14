@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.26)
 
-add_executable(test_vec test_vec.cpp test_vec.cu)
-target_link_libraries(test_vec PRIVATE vec)
+file(GLOB TEST_SOURCES test_files/*.cu)
 
-add_test(NAME test_vec COMMAND test_vec)
+foreach(src ${TEST_SOURCES})
+
+    get_filename_component(test_name ${src} NAME_WE)
+
+    add_executable(${test_name}
+        test_files/${test_name}.cu
+    )
+
+    target_link_libraries(${test_name} PRIVATE vec)
+    add_test(NAME ${test_name} COMMAND ${test_name})
+
+endforeach()
