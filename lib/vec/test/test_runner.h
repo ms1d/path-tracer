@@ -1,5 +1,5 @@
 #pragma once
-#include "vec.h"
+#include "vec.cuh"
 #include <random>
 
 inline std::mt19937 rng(std::random_device{}());

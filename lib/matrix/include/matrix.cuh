@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vec.h"
+#include "vec.cuh"
 #ifndef __host__
 #define __host__
 #endif

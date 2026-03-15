@@ -1,5 +1,5 @@
-#include "ray.h"
-#include "vec3.h"
+#include "ray.cuh"
+#include "vec3.cuh"
 
 // Moller-Trumbore ray-triangle intersection
 __host__ __device__ vec3 MTRayTriIntersect(Ray ray, vec3 tri) {

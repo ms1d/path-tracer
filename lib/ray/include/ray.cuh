@@ -7,7 +7,7 @@
 #define __device__
 #endif
 
-#include "vec.h"
+#include "vec.cuh"
 #include <iostream>
 
 struct Ray {

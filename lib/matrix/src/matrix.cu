@@ -1,5 +1,5 @@
-#include "matrix.h"
-#include "vec.h"
+#include "matrix.cuh"
+#include "vec.cuh"
 
 template<size_t r, size_t c>
 __host__ __device__ float matrix<r, c>::det() const {

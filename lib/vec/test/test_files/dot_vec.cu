@@ -1,4 +1,4 @@
-#include "vec.h"
+#include "vec.cuh"
 #include "../test_runner.h"
 #include <cassert>
 #include <cstdio>

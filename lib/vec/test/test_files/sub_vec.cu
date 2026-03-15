@@ -1,6 +1,6 @@
 #include "../test_runner.h"
 #include <cassert>
-#include "vec.h"
+#include "vec.cuh"
 
 template<size_t dim>
 __global__ void sub_vec_kernel(const vec<dim>* v1, const vec<dim>* v2, vec<dim>* v3) {
