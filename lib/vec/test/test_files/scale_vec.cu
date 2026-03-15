@@ -3,28 +3,28 @@
 #include <cassert>
 
 template<size_t dim>
-__global__ void scale_vec_kernel(const vec<dim>* v1, vec<dim>* v2, vec<dim>* v3, float* scale) {
+__global__ void scale_vec_kernel(const vec<dim>* v1, vec<dim>* v2, vec<dim>* res, float* scale) {
 	*v2 = *v1 * *scale;
-	*v3 = *scale * *v1;
+	*res = *scale * *v1;
 }
 
 template<size_t dim>
 void scale_vec_cu() {
-	vec<dim> *v1, *v2, *v3;
+	vec<dim> *v1, *v2, *res;
 	float *scale;
 
 	cudaMallocManaged(&v1, sizeof(vec<dim>));
 	cudaMallocManaged(&v2, sizeof(vec<dim>));
-	cudaMallocManaged(&v3, sizeof(vec<dim>));
+	cudaMallocManaged(&res, sizeof(vec<dim>));
 	cudaMallocManaged(&scale, sizeof(float));
 
 	*v1 = init_vec<dim>();
     *scale = dist(rng);
 
-	scale_vec_kernel<<<1, 1>>>(v1, v2, v3, scale);
+	scale_vec_kernel<<<1, 1>>>(v1, v2, res, scale);
 	cudaDeviceSynchronize();
 
-	assert(*v2 == *v3);
+	assert(*v2 == *res);
 
 	vec<dim> check_vec;
 	for (size_t i = 0; i < dim; i++) {
@@ -35,7 +35,7 @@ void scale_vec_cu() {
 
 	cudaFree(v1);
 	cudaFree(v2);
-	cudaFree(v3);
+	cudaFree(res);
 	cudaFree(scale);
 }
 
@@ -45,9 +45,9 @@ void scale_vec_cpp() {
 	float scale = dist(rng);
 
 	vec<dim> v2 = v1 * scale;
-	vec<dim> v3 = scale * v1;
+	vec<dim> res = scale * v1;
 
-	assert(v2 == v3);
+	assert(v2 == res);
 
 	vec<dim> check_vec;
 	for (size_t i = 0; i < dim; i++) {

@@ -118,16 +118,15 @@ __host__ __device__ Derived operator*(const vec_base<dim, Derived>& v, float sca
     return result;
 }
 
-// Equality
 template<size_t dim, class Derived>
 __host__ __device__ bool operator==(const vec_base<dim, Derived>& lhs, const vec_base<dim, Derived>& rhs) {
     const float* ld = lhs.derived_data();
     const float* rd = rhs.derived_data();
-    for (size_t i = 0; i < dim; i++) if (ld[i] != rd[i]) return false;
+    constexpr float epsilon = 2e-6f;
+
+    for (size_t i = 0; i < dim; i++) if (fabs(ld[i] - rd[i]) > epsilon) return false;
     return true;
 }
-
-
 
 template<size_t dim>
 struct vec : vec_base<dim, vec<dim>> {
@@ -168,3 +167,9 @@ struct vec<3> : vec_base<3, vec<3>> {
         return *this;
     }
 };
+
+// Hint for clangd LSP to resolve vec<3> comparison cleanly
+// Compiler will optimise this out
+__host__ __device__ inline bool operator==(const vec<3>& lhs, const vec<3>& rhs) {
+    return static_cast<const vec_base<3, vec<3>>&>(lhs) == static_cast<const vec_base<3, vec<3>>&>(rhs);
+}

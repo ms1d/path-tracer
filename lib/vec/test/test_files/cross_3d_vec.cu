@@ -2,22 +2,21 @@
 #include "../test_runner.h"
 #include <cassert>
 
-__global__ void cross_3d_vec_kernel(const vec<3> *v1, const vec<3> *v2, vec<3> *v3) {
-	*v3 = *v1 ^ *v2;
+__global__ void cross_3d_vec_kernel(const vec<3> *v1, const vec<3> *v2, vec<3> *res) {
+	*res = *v1 ^ *v2;
 }
 
 void cross_3d_vec_cu() {
-	const float epsilon = 2e-6;
-	vec<3> *v1, *v2, *v3;
+	vec<3> *v1, *v2, *res;
 
 	cudaMallocManaged(&v1, sizeof(vec<3>));
 	cudaMallocManaged(&v2, sizeof(vec<3>));
-	cudaMallocManaged(&v3, sizeof(vec<3>));
+	cudaMallocManaged(&res, sizeof(vec<3>));
 
 	*v1 = init_vec<3>();
 	*v2 = init_vec<3>();
 
-	cross_3d_vec_kernel<<<1, 1>>>(v1, v2, v3);
+	cross_3d_vec_kernel<<<1, 1>>>(v1, v2, res);
 	cudaDeviceSynchronize();
 	
 	vec<3> check_vec;
@@ -26,18 +25,16 @@ void cross_3d_vec_cu() {
 	check_vec.y = v1->z * v2->x - v1->x * v2->z;
 	check_vec.z = v1->x * v2->y - v1->y * v2->x;
 
-	for (int i = 0; i < 3; i++) {
-		assert(check_vec.data[i] - epsilon <= v3->data[i] && check_vec.data[i] + epsilon >= v3->data[i]);
-	}
+	assert(check_vec == *res);
 
 	cudaFree(v1);
     cudaFree(v2);
-    cudaFree(v3);
+    cudaFree(res);
 }
 
 void cross_3d_vec_cpp() {
 	const vec<3> v1 = init_vec<3>(), v2 = init_vec<3>();
-	vec<3> v3 = v1 ^ v2;
+	vec<3> res = v1 ^ v2;
 
 	vec<3> check_vec;
 
@@ -45,7 +42,7 @@ void cross_3d_vec_cpp() {
 	check_vec.y = v1.z * v2.x - v1.x * v2.z;
 	check_vec.z = v1.x * v2.y - v1.y * v2.x;
 
-	assert(check_vec == v3);
+	assert(check_vec == res);
 }
 
 int main() {

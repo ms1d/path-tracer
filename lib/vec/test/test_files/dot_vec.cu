@@ -29,7 +29,7 @@ void dot_vec_cu() {
 	for (size_t i = 0; i < dim; i++)
 		sum += v1->data[i] * v2->data[i];
 	
-	assert(sum - epsilon < *dot && sum + epsilon > *dot);
+	assert(fabs(sum - *dot) < epsilon);
 
 	cudaFree(v1);
 	cudaFree(v2);
