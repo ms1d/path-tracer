@@ -5,6 +5,14 @@
 inline std::mt19937 rng(std::random_device{}());
 inline std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
 
+template<size_t dim>
+vec<dim> init_vec() {
+    vec<dim> v;
+    for (size_t i = 0; i < dim; ++i)
+        v.data[i] = dist(rng);
+    return v;
+}
+
 template<size_t r, size_t c>
 matrix<r, c> init_matrix() {
     matrix<r, c> m;

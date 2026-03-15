@@ -3,13 +3,37 @@
 #include <cassert>
 
 template<size_t r, size_t c>
-__global__ void scale_matrix_kernel() {
-
+__global__ void scale_matrix_kernel(const matrix<r,c>* m, const float* scalar, matrix<r,c>* res) {
+	*res = *scalar * *m;
 }
 
 template<size_t r, size_t c>
 void scale_matrix_cu() {
+	matrix<r,c> *m, *res;
+	float *scalar;
 
+	cudaMallocManaged(&m, sizeof(matrix<r,c>));
+	cudaMallocManaged(&res, sizeof(matrix<r,c>));
+    cudaMallocManaged(&scalar, sizeof(float));
+
+	*m = init_matrix<r,c>();
+	*scalar = dist(rng);
+
+	scale_matrix_kernel<<<1,1>>>(m, scalar, res);
+	cudaDeviceSynchronize();
+	
+	matrix<r,c> check_matrix;
+	for (int i = 0; i < r; i++) {
+		for (int j = 0; j < c; j++) {
+			check_matrix.data[i][j] = m->data[i][j] * *scalar;
+		}
+	}
+
+	assert(check_matrix == *res);
+
+	cudaFree(m);
+	cudaFree(res);
+	cudaFree(scalar);
 }
 
 template<size_t r, size_t c>
@@ -19,7 +43,14 @@ void scale_matrix_cpp() {
 
 	matrix<r,c> res = m * scalar;
 
-	// Assert please
+	matrix<r,c> check_matrix;
+	for (int i = 0; i < r; i++) {
+		for (int j = 0; j < c; j++) {
+			check_matrix.data[i][j] = m.data[i][j] * scalar;
+		}
+	}
+
+	assert(check_matrix == res);
 }
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>

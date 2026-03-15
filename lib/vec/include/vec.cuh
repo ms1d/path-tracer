@@ -36,6 +36,11 @@ struct vec_base {
     }
 
 
+	__host__ __device__ float operator[](int i) const {
+		return derived_data()[i];
+	}
+
+
 
     __host__ __device__ float GetMagnitude() const {
         const float* d = derived_data();

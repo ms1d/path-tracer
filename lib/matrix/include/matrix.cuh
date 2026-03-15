@@ -60,12 +60,12 @@ struct matrix {
 
 
 	__host__ __device__ vec<r> operator*(const vec<c>& v) const {
-		vec<r> res = v;
+		vec<r> res;
 
 		for (size_t i = 0; i < r; ++i) {
 			float sum = 0;
 			for (size_t j = 0; j < c; ++j)
-				sum += data[i][j] * v[j];
+				sum += data[i][j] * v.data[j];
 			res.data[i] = sum;
 		}
 

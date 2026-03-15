@@ -3,7 +3,7 @@
 #include <cassert>
 
 template<size_t r, size_t c>
-__global__ void add_matrix_kernel(matrix<r,c> *m1, matrix<r,c> *m2, matrix<r,c> *res) {
+__global__ void add_matrix_kernel(const matrix<r,c> *m1, const matrix<r,c> *m2, matrix<r,c> *res) {
 	*res = *m1 + *m2;
 }
 
