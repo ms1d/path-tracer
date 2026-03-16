@@ -5,6 +5,8 @@
 inline std::mt19937 rng(std::random_device{}());
 inline std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
 
+constexpr float epsilon = 2e-6;
+
 template<size_t dim>
 vec<dim> init_vec() {
     vec<dim> v;

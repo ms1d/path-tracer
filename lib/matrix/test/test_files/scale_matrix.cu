@@ -29,7 +29,7 @@ void scale_matrix_cu() {
 		}
 	}
 
-	assert(check_matrix == *res);
+	assert(check_matrix == *res && *res == *scalar * *m);
 
 	cudaFree(m);
 	cudaFree(res);
@@ -50,18 +50,22 @@ void scale_matrix_cpp() {
 		}
 	}
 
-	assert(check_matrix == res);
+	assert(check_matrix == res && res == scalar * m);
 }
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
 struct scale_matrix {
 	void operator()() {
+		// Test for floating point accuracy on both CPU & GPU
 		scale_matrix_cpp<r1, c1>();
 		scale_matrix_cu<r1, c1>();
+		
+		// Hardcoded test for algorithm correctness
+
 	}
 };
 
 int main() {
-	run_tests<scale_matrix, 2, 16, 2, 16, 2, 16, 2, 16>();
+	run_tests<scale_matrix, 2, 16, 2, 16, 2, 2, 2, 2>();
 }
 

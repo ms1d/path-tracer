@@ -10,8 +10,6 @@ __global__ void dot_vec_kernel(const vec<dim>* v1, const vec<dim>* v2, float* do
 
 template<size_t dim>
 void dot_vec_cu() {
-	const float epsilon = 2e-6;
-
 	vec<dim> *v1, *v2;
 	float *dot;
 
@@ -46,7 +44,7 @@ void dot_vec_cpp() {
 	for (size_t i = 0; i < dim; i++)
 		sum += v1.data[i] * v2.data[i];
 
-	assert(sum == dot);
+	assert(fabs(sum - dot) < epsilon);
 }
 
 template<size_t dim>

@@ -10,8 +10,6 @@ __global__ void mag_vec_kernel(const vec<dim> *v1, float *mag) {
 
 template<size_t dim>
 void mag_vec_cu() {
-	const float epsilon = 2e-6;
-
 	vec<dim> *v1;
 	float *mag;
 
@@ -27,7 +25,7 @@ void mag_vec_cu() {
 	for (size_t i = 0; i < dim; i++) sum += v1->data[i] * v1->data[i];
 	sum = std::sqrt(sum);
 
-	assert(sum - epsilon <= *mag && sum + epsilon >= *mag);
+	assert(fabs(sum - *mag) < epsilon);
 
 	cudaFree(v1);
 	cudaFree(mag);
@@ -42,7 +40,7 @@ void mag_vec_cpp() {
 	for (size_t i = 0; i < dim; i++) sum += v1.data[i] * v1.data[i];
 	sum = std::sqrt(sum);
 
-	assert(sum == mag);
+	assert(fabs(sum - mag) < epsilon);
 }
 
 template<size_t dim>

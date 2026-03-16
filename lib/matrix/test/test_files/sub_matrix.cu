@@ -21,7 +21,7 @@ void sub_matrix_cu() {
 	sub_matrix_kernel<<<1,1>>>(m1, m2, res);
 	cudaDeviceSynchronize();
 
-	assert(*res == *m1 - *m2);
+	assert(*res == *m2 - *m1);
 
 	cudaFree(m1);
     cudaFree(m2);
@@ -39,8 +39,11 @@ void sub_matrix_cpp() {
 template<size_t r1, size_t c1, size_t r2, size_t c2>
 struct sub_matrix {
 	void operator()() {
+		// Test for floating point accuracy on both CPU & GPU
 		sub_matrix_cpp<r1, c1>();
 		sub_matrix_cu<r1, c1>();
+
+		// Hardcoded test for algorithm correctness
 	}
 };
 

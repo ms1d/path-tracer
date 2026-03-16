@@ -21,7 +21,7 @@ void add_matrix_cu() {
 	add_matrix_kernel<<<1,1>>>(m1, m2, res);
 	cudaDeviceSynchronize();
 
-	assert(*res == *m1 + *m2);
+	assert(*res == *m2 + *m1);
 
 	cudaFree(m1);
     cudaFree(m2);
@@ -33,14 +33,17 @@ void add_matrix_cpp() {
 	const matrix<r,c> m1 = init_matrix<r,c>(), m2 = init_matrix<r,c>();
 	matrix<r,c> res = m1 + m2;
 
-	assert(res == m1 + m2);
+	assert(res == m2 + m1);
 }
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
 struct add_matrix {
 	void operator()() {
+		// Test for floating point accuracy on both CPU & GPU
 		add_matrix_cpp<r1, c1>();
 		add_matrix_cu<r1, c1>();
+
+		// Hardcoded test for algorithm correctness
 	}
 };
 

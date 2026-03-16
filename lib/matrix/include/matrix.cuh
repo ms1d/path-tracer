@@ -14,7 +14,12 @@ struct matrix {
 
 
 	float data[r][c];
-	
+
+
+
+	__host__ __device__ matrix() {}
+
+
 
 	__host__ __device__ matrix& operator+=(const matrix& other) {
 		for (int i = 0; i < r; i++) {
@@ -52,9 +57,40 @@ struct matrix {
 
 
 
+	__host__ __device__ matrix<r-1, c-1> get_minor(int row, int col) const {
+		matrix<r-1,c-1> res;
+		int curr_row, curr_col = 0;
+
+		for (int i = 0; i < r; i++) {
+			for (int j = 0; j < c; j++) {
+				if (i == row || j == col) continue;
+
+				res[curr_row][curr_col] = data[i][j];
+
+				curr_col++;
+			}
+
+			curr_row++;
+		}
+
+		return res;
+	}
+
 	__host__ __device__ float det() const {
 		static_assert(r == c, "Matrix must be square");
-		throw std::exception();
+
+		// Base case for recursion (1 by 1 matrix)
+		if (r == 1) return data[0][0];
+
+		float det = 0;
+
+		int sign = 1;
+		for (int j = 0; j < c; j++) {
+			det += sign * data[0][j] * get_minor(0, j);
+			sign *= -1;
+		}
+
+		return det;
 	};
 
 
@@ -118,16 +154,16 @@ __host__ __device__ matrix<r1, c2> operator*(const matrix<r1, c1>& m1, const mat
 
 	matrix<r1,c2> res;
 
-    for (size_t i = 0; i < r1; ++i) {
-        for (size_t j = 0; j < c2; ++j) {
-            float sum = 0;
+	for (size_t i = 0; i < r1; ++i) {
+		for (size_t j = 0; j < c2; ++j) {
+			float sum = 0;
 
-            for (size_t k = 0; k < c1; ++k)
-                sum += m1.data[i][k] * m2.data[k][j];
+			for (size_t k = 0; k < c1; ++k)
+				sum += m1.data[i][k] * m2.data[k][j];
 
-            res.data[i][j] = sum;
-        }
-    }
+			res.data[i][j] = sum;
+		}
+	}
 
 	return res;
 }

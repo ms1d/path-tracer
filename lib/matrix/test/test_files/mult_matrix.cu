@@ -74,8 +74,11 @@ template<size_t r1, size_t c1, size_t r2, size_t c2>
 struct mult_matrix {
 	void operator()() {
 		if constexpr (c1 == r2) {
+			// Test for floating point accuracy on both CPU & GPU
 			mult_matrix_cpp<r1, c1, r2, c2>();
 			mult_matrix_cu<r1, c1, r2, c2>();
+
+			// Hardcoded test for algorithm correctness
 		}
 	}
 };
