@@ -65,6 +65,13 @@ struct scale_vec {
 		scale_vec_cu<dim>();
 
 		// Hardcoded test for algorithm correctness
+		scale_vec_example();
+	}
+
+	void scale_vec_example() {
+		vec<3> v{1,2,3};
+		float scalar = 2;
+		assert(scalar * v == v * scalar), assert(scalar * v == vec<3>(2,4,6));
 	}
 };
 

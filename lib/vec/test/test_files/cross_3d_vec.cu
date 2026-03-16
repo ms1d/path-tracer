@@ -45,12 +45,20 @@ void cross_3d_vec_cpp() {
 	assert(check_vec == res);
 }
 
+void cross_3d_vec_example() {
+	vec<3> v1{0,1,2}, v2{2,4,6};
+	vec<3> res1 = v1 ^ v2, res2 = v2 ^ v1;
+	assert(res1 == -1.0f * res2);
+	assert(res1 == vec<3>(-2,4,-2));
+}
+
 int main() {
 	// Test for floating point accuracy on both CPU & GPU
 	cross_3d_vec_cpp();
 	cross_3d_vec_cu();
     
 	// Hardcoded test for algorithm correctness
+	cross_3d_vec_example();
 	
 	return 0;
 }

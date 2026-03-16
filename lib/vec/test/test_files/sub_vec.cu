@@ -50,13 +50,20 @@ void sub_vec_cpp() {
 
 template<size_t dim>
 struct sub_vec {
-    void operator()() const {
+    void operator()() {
 		// Test for floating point accuracy on both CPU & GPU
 		sub_vec_cpp<dim>();
 		sub_vec_cu<dim>();
 
 		// Hardcoded test for algorithm correctness
+		sub_vec_example();
     }
+
+	void sub_vec_example() {
+		vec<3> v1{2,4,6}, v2{1,2,3};
+		assert(v1 - v2 == vec<3>(1,2,3));
+
+	}
 };
 
 int main() {

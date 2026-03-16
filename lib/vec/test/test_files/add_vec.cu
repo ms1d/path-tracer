@@ -49,13 +49,21 @@ void add_vec_cpp() {
 
 template<size_t dim>
 struct add_vec {
-    void operator()() const {
+    void operator()() {
 		// Test for floating point accuracy on both CPU & GPU
 		add_vec_cpp<dim>();
 		add_vec_cu<dim>();
 
 		// Hardcoded test for algorithm correctness
-    }
+		add_vec_example();
+	}
+
+	void add_vec_example() {
+		const vec<3> v1{0,1,2}, v2{0,1,4};
+		vec<3> res1 = v1 + v2, res2 = v2 + v1;
+		assert(res1 == res2);
+		assert(res1 == vec<3>(0, 2, 6));
+	}
 
 };
 

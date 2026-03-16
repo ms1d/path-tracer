@@ -55,6 +55,14 @@ struct dot_vec {
 		dot_vec_cu<dim>();
 
 		// Hardcoded test for algorithm correctness
+		dot_vec_example();
+	}
+
+	void dot_vec_example() {
+		vec<3> v1{1,2,3}, v2{4,5,6};
+		float dot = v1 * v2;
+		assert(dot == v2 * v1);
+		assert(dot == 32);
 	}
 };
 

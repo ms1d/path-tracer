@@ -20,6 +20,9 @@
 // for specialised vectors (e.g. 2D x and y, 3D x, y and z, 4D x, y, z and w...)
 template<size_t dim, class Derived>
 struct vec_base {
+
+
+
     static_assert(dim > 1, "Vector dimensions must be > 1");
 
 
@@ -43,7 +46,7 @@ struct vec_base {
 
 
 
-    __host__ __device__ float GetMagnitude() const {
+    __host__ __device__ float mag() const {
         const float* d = derived_data();
         float sum = 0;
         for (size_t i = 0; i < dim; i++) sum += d[i] * d[i];
@@ -107,46 +110,68 @@ struct vec_base {
         return os << ")";
     }
 #endif
+
+
+
+	__host__ __device__ bool operator==(const vec_base<dim, Derived>& rhs) const {
+		const float* ld = derived_data();
+		const float* rd = rhs.derived_data();
+		constexpr float epsilon = 2e-6f;
+
+		for (size_t i = 0; i < dim; i++) if (fabs(ld[i] - rd[i]) > epsilon) return false;
+		return true;
+	}
+
+
+
+	__host__ __device__ Derived operator*(float scalar) const {
+		Derived result = static_cast<const Derived&>(*this);
+		result *= scalar;
+		return result;
+	}
+
+
+
 };
 
-// Scalar multiplication
-template<size_t dim, class Derived>
-__host__ __device__ Derived operator*(float scalar, const vec_base<dim, Derived>& v) {
-    Derived result = static_cast<const Derived&>(v);
-    result *= scalar;
-    return result;
-}
 
-template<size_t dim, class Derived>
-__host__ __device__ Derived operator*(const vec_base<dim, Derived>& v, float scalar) {
-    Derived result = static_cast<const Derived&>(v);
-    result *= scalar;
-    return result;
-}
 
-template<size_t dim, class Derived>
-__host__ __device__ bool operator==(const vec_base<dim, Derived>& lhs, const vec_base<dim, Derived>& rhs) {
-    const float* ld = lhs.derived_data();
-    const float* rd = rhs.derived_data();
-    constexpr float epsilon = 2e-6f;
-
-    for (size_t i = 0; i < dim; i++) if (fabs(ld[i] - rd[i]) > epsilon) return false;
-    return true;
-}
 
 template<size_t dim>
 struct vec : vec_base<dim, vec<dim>> {
+
+
+
 	float data[dim];
+
+
+
 };
+
+
+
+// float * scalar must be a non-member function
+template<size_t dim>
+__host__ __device__ inline vec<dim> operator*(float scalar, const vec<dim>& v) { return v * scalar; }
 
 
 
 template<>
 struct vec<3> : vec_base<3, vec<3>> {
+
+
+
+	using base = vec_base<3, vec<3>>;
+
+
+
     union {
         float data[3];
         struct { float x, y, z; };
     };
+
+
+
 
     __host__ __device__ vec() {}
 
@@ -158,6 +183,8 @@ struct vec<3> : vec_base<3, vec<3>> {
 		x = other.x; y = other.y; z = other.z;
 		return *this;
 	}
+
+
 
     // Cross product
     __host__ __device__ vec operator^(const vec& other) const {
@@ -172,10 +199,27 @@ struct vec<3> : vec_base<3, vec<3>> {
         z = _x * other.y - _y * other.x;
         return *this;
     }
-};
 
-// Hint for clangd LSP to resolve vec<3> comparison cleanly
-// Compiler will optimise this out
-__host__ __device__ inline bool operator==(const vec<3>& lhs, const vec<3>& rhs) {
-    return static_cast<const vec_base<3, vec<3>>&>(lhs) == static_cast<const vec_base<3, vec<3>>&>(rhs);
-}
+
+
+	// Explicit redifinitions of operators to help clangd LSP
+	// in .cu files. Compiler will optimise these out fully.
+	// It struggles finding CRTP base methods through vec_base
+	__host__ __device__ vec<3> operator+(const vec<3>& other) const { return base::operator+(other); }
+	__host__ __device__ vec<3>& operator+=(const vec<3>& other) { return base::operator+=(other); }
+
+	__host__ __device__ vec<3> operator-(const vec<3>& other) const { return base::operator-(other); }
+	__host__ __device__ vec<3>& operator-=(const vec<3>& other) { return base::operator-=(other); }
+
+	__host__ __device__ float operator*(const vec<3>& other) const { return base::operator*(other); }
+	__host__ __device__ vec<3>& operator*=(float scalar) { return base::operator*=(scalar); }
+	__host__ __device__ vec<3> operator*(float scalar) const { return base::operator*(scalar); }
+
+	__host__ __device__ float operator[](int i) const { return base::operator[](i); }
+	__host__ __device__ float mag() const { return base::mag(); }
+
+	__host__ __device__ bool operator==(const vec<3>& other) const { return base::operator==(other); }
+
+
+
+};

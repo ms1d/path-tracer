@@ -5,7 +5,7 @@
 
 template<size_t dim>
 __global__ void mag_vec_kernel(const vec<dim> *v1, float *mag) {
-	*mag = v1->GetMagnitude();
+	*mag = v1->mag();
 }
 
 template<size_t dim>
@@ -34,7 +34,7 @@ void mag_vec_cu() {
 template<size_t dim>
 void mag_vec_cpp() {
 	const vec<dim> v1 = init_vec<dim>();
-	float mag = v1.GetMagnitude();
+	float mag = v1.mag();
 
 	float sum = 0;
 	for (size_t i = 0; i < dim; i++) sum += v1.data[i] * v1.data[i];
@@ -51,6 +51,12 @@ struct mag_vec {
 		mag_vec_cu<dim>();
 
 		// Hardcoded test for algorithm correctness
+		mag_vec_example();
+	}
+
+	void mag_vec_example() {
+		vec<3> v{1,2,3};
+		assert(fabs(v.mag() - std::sqrt(14)) < epsilon);
 	}
 };
 
