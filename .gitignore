@@ -40,3 +40,7 @@ compile_commands.json
 
 # clangd config
 .clangd
+
+# Helper scripts at project root
+/test
+/test-failed

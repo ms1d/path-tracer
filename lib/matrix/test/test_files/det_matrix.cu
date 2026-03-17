@@ -36,9 +36,10 @@ void det_matrix_cpp() {
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
 struct det_matrix {
-	void operator()() {
-		if constexpr (r1 != c1) return;
+	// Only need to test valid sizes
+	void operator()() requires(r1 != c1) {}
 
+	void operator()() requires(r1 == c1) {
 		// Test for floating point accuracy on both CPU & GPU
 		det_matrix_cpp<r1,c1>();
 		det_matrix_cu<r1,c1>();

@@ -4,13 +4,11 @@
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
 __global__ void mult_matrix_kernel(const matrix<r1,c1>* m1, const matrix<r2,c2>* m2, matrix<r1,c2>* res) {
-	if constexpr (c1 != r2) return;
 	*res = *m1 * *m2;
 }
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
 void mult_matrix_cu() {
-	if constexpr (c1 != r2) return;
 	matrix<r1,c1> *m1;
 	matrix<r2,c2> *m2;
 	matrix<r1,c2> *res;
@@ -48,8 +46,6 @@ void mult_matrix_cu() {
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
 void mult_matrix_cpp() {
-	if constexpr (c1 != r2) return;
-
 	const matrix<r1,c1> m1 = init_matrix<r1,c1>();
 	const matrix<r2,c2> m2 = init_matrix<r2,c2>();
 
@@ -72,15 +68,16 @@ void mult_matrix_cpp() {
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
 struct mult_matrix {
-	void operator()() {
-		if constexpr (c1 == r2) {
-			// Test for floating point accuracy on both CPU & GPU
-			mult_matrix_cpp<r1, c1, r2, c2>();
-			mult_matrix_cu<r1, c1, r2, c2>();
+	// Only need to test valid sizes
+	void operator()() requires(c1 != r2){}
 
-			// Hardcoded test for algorithm correctness
-			mult_matrix_example();
-		}
+	void operator()() requires(c1 == r2) {
+		// Test for floating point accuracy on both CPU & GPU
+		mult_matrix_cpp<r1, c1, r2, c2>();
+		mult_matrix_cu<r1, c1, r2, c2>();
+
+		// Hardcoded test for algorithm correctness
+		mult_matrix_example();
 	}
 
 	void mult_matrix_example() {

@@ -57,15 +57,18 @@ struct matrix {
 
 
 
-	__host__ __device__ matrix<r-1, c-1> get_minor(int row, int col) const {
+	__host__ __device__ matrix<r-1, c-1> get_minor(int row, int col) const requires(r > 1 && c > 1) {
 		matrix<r-1,c-1> res;
-		int curr_row, curr_col = 0;
+		int curr_row = 0;
 
 		for (int i = 0; i < r; i++) {
-			for (int j = 0; j < c; j++) {
-				if (i == row || j == col) continue;
+			if (i == row) continue;
+			int curr_col = 0;
 
-				res[curr_row][curr_col] = data[i][j];
+			for (int j = 0; j < c; j++) {
+				if (j == col) continue;
+
+				res.data[curr_row][curr_col] = data[i][j];
 
 				curr_col++;
 			}
@@ -76,17 +79,16 @@ struct matrix {
 		return res;
 	}
 
-	__host__ __device__ float det() const {
-		static_assert(r == c, "Matrix must be square");
 
-		// Base case for recursion (1 by 1 matrix)
-		if (r == 1) return data[0][0];
 
+	__host__ __device__ float det() const requires(r == c && r == 1) { return data[0][0]; }
+	__host__ __device__ float det() const requires(r == c && r > 1){
 		float det = 0;
 
 		int sign = 1;
 		for (int j = 0; j < c; j++) {
-			det += sign * data[0][j] * get_minor(0, j);
+			matrix<r-1,c-1> minor = get_minor(0, j);
+			det += sign * data[0][j] * minor.det();
 			sign *= -1;
 		}
 
@@ -149,9 +151,7 @@ __host__ __device__ matrix<r, c> operator*(float scalar, const matrix<r, c>& m) 
 }
 
 template<size_t r1, size_t r2, size_t c1, size_t c2>
-__host__ __device__ matrix<r1, c2> operator*(const matrix<r1, c1>& m1, const matrix<r2, c2>& m2) {
-	static_assert(c1 == r2, "Matrix dimensions must match");
-
+__host__ __device__ matrix<r1, c2> operator*(const matrix<r1, c1>& m1, const matrix<r2, c2>& m2) requires(c1 == r2) {
 	matrix<r1,c2> res;
 
 	for (size_t i = 0; i < r1; ++i) {
