@@ -1,23 +1,23 @@
 #include "../test_runner.h"
-#include "matrix.cuh"
+#include "mat.cuh"
 #include <cassert>
 
 template<size_t r, size_t c>
-__global__ void det_matrix_kernel(const matrix<r,c> *m, float *det) {
+__global__ void det_mat_kernel(const mat<r,c> *m, float *det) {
 	*det = m->det();
 }
 
 template<size_t r, size_t c>
-void det_matrix_cu() {
-	matrix<r,c> *m;
+void det_mat_cu() {
+	mat<r,c> *m;
 	float *det;
 
-	cudaMallocManaged(&m, sizeof(matrix<r,c>));
+	cudaMallocManaged(&m, sizeof(mat<r,c>));
 	cudaMallocManaged(&det, sizeof(float));
 
-	*m = init_matrix<r,c>();
+	*m = init_mat<r,c>();
 
-	det_matrix_kernel<<<1,1>>>(m, det);
+	det_mat_kernel<<<1,1>>>(m, det);
 	cudaDeviceSynchronize();
 
 	assert(fabs(*det - m->det()) < epsilon);
@@ -27,29 +27,29 @@ void det_matrix_cu() {
 }
 
 template<size_t r, size_t c>
-void det_matrix_cpp() {
-    const matrix<r,c> m = init_matrix<r,c>();
+void det_mat_cpp() {
+    const mat<r,c> m = init_mat<r,c>();
 	float det = m.det();
 
 	assert(fabs(det - m.det()) < epsilon);
 }
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
-struct det_matrix {
+struct det_mat {
 	// Only need to test valid sizes
 	void operator()() requires(r1 != c1) {}
 
 	void operator()() requires(r1 == c1) {
 		// Test for floating point accuracy on both CPU & GPU
-		det_matrix_cpp<r1,c1>();
-		det_matrix_cu<r1,c1>();
+		det_mat_cpp<r1,c1>();
+		det_mat_cu<r1,c1>();
 
 		// Hardcoded test for algorithm correctness
-		det_matrix_example();
+		det_mat_example();
 	}
 
-	void det_matrix_example() {
-		matrix<3,3> m;
+	void det_mat_example() {
+		mat<3,3> m;
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -62,5 +62,5 @@ struct det_matrix {
 };
 
 int main() {
-	run_tests<det_matrix, 2, 16, 2, 16, 2, 2, 2, 2>();
+	run_tests<det_mat, 2, 16, 2, 16, 2, 2, 2, 2>();
 }

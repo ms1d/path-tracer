@@ -1,5 +1,5 @@
 #pragma once
-#include "matrix.cuh"
+#include "mat.cuh"
 #include <random>
 
 inline std::mt19937 rng(std::random_device{}());
@@ -16,8 +16,8 @@ vec<dim> init_vec() {
 }
 
 template<size_t r, size_t c>
-matrix<r, c> init_matrix() {
-    matrix<r, c> m;
+mat<r, c> init_mat() {
+    mat<r, c> m;
     for (size_t i = 0; i < r; ++i)
         for (size_t j = 0; j < c; ++j)
             m.data[i][j] = dist(rng);

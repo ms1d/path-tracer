@@ -1,24 +1,24 @@
 #include "../test_runner.h"
-#include "matrix.cuh"
+#include "mat.cuh"
 #include <cassert>
 
 template<size_t r, size_t c>
-__global__ void sub_matrix_kernel(const matrix<r,c> *m1, const matrix<r,c> *m2, matrix<r,c> *res) {
+__global__ void sub_mat_kernel(const mat<r,c> *m1, const mat<r,c> *m2, mat<r,c> *res) {
 	*res = *m1 - *m2;
 }
 
 template<size_t r, size_t c>
-void sub_matrix_cu() {
-	matrix<r,c> *m1, *m2, *res;
+void sub_mat_cu() {
+	mat<r,c> *m1, *m2, *res;
 
-	cudaMallocManaged(&m1, sizeof(matrix<r,c>));
-	cudaMallocManaged(&m2, sizeof(matrix<r,c>));
-	cudaMallocManaged(&res, sizeof(matrix<r,c>));
+	cudaMallocManaged(&m1, sizeof(mat<r,c>));
+	cudaMallocManaged(&m2, sizeof(mat<r,c>));
+	cudaMallocManaged(&res, sizeof(mat<r,c>));
 
-	*m1 = init_matrix<r,c>();
-    *m2 = init_matrix<r,c>();
+	*m1 = init_mat<r,c>();
+    *m2 = init_mat<r,c>();
 
-	sub_matrix_kernel<<<1,1>>>(m1, m2, res);
+	sub_mat_kernel<<<1,1>>>(m1, m2, res);
 	cudaDeviceSynchronize();
 
 	assert(*res == *m1 - *m2);
@@ -29,26 +29,26 @@ void sub_matrix_cu() {
 }
 
 template<size_t r, size_t c>
-void sub_matrix_cpp() {
-	const matrix<r,c> m1 = init_matrix<r,c>(), m2 = init_matrix<r,c>();
-	matrix<r,c> res = m1 - m2;
+void sub_mat_cpp() {
+	const mat<r,c> m1 = init_mat<r,c>(), m2 = init_mat<r,c>();
+	mat<r,c> res = m1 - m2;
 
 	assert(res == m1 - m2);
 }
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
-struct sub_matrix {
+struct sub_mat {
 	void operator()() {
 		// Test for floating point accuracy on both CPU & GPU
-		sub_matrix_cpp<r1, c1>();
-		sub_matrix_cu<r1, c1>();
+		sub_mat_cpp<r1, c1>();
+		sub_mat_cu<r1, c1>();
 
 		// Hardcoded test for algorithm correctness
-		sub_matrix_example();
+		sub_mat_example();
 	}
 
-	void sub_matrix_example() {
-		matrix<3,3> m1, m2;
+	void sub_mat_example() {
+		mat<3,3> m1, m2;
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -57,7 +57,7 @@ struct sub_matrix {
 			}
 		}
 
-		matrix<3,3> res1 = m1 - m2, res2 = m2 - m1;
+		mat<3,3> res1 = m1 - m2, res2 = m2 - m1;
 
 		assert(res1 == -1 * res2);
 		assert(res1.data[0][0] == 0);
@@ -73,6 +73,6 @@ struct sub_matrix {
 };
 
 int main() {
-	run_tests<sub_matrix, 2, 16, 2, 16, 2, 2, 2, 2>();
+	run_tests<sub_mat, 2, 16, 2, 16, 2, 2, 2, 2>();
 }
 

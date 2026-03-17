@@ -1,24 +1,24 @@
 #include "../test_runner.h"
-#include "matrix.cuh"
+#include "mat.cuh"
 #include "vec.cuh"
 #include <cassert>
 
 template<size_t r, size_t c>
-__global__ void transform_vector_kernel(const matrix<r,c>* m, const vec<c>* v, vec<r>* res) {
+__global__ void transform_vector_kernel(const mat<r,c>* m, const vec<c>* v, vec<r>* res) {
 	*res = *m * *v;
 }
 
 template<size_t r, size_t c>
 void transform_vector_cu() {
-	matrix<r,c> *m;
+	mat<r,c> *m;
 	vec<c> *v;
 	vec<r> *res;
 
-	cudaMallocManaged(&m, sizeof(matrix<r,c>));
+	cudaMallocManaged(&m, sizeof(mat<r,c>));
     cudaMallocManaged(&v, sizeof(vec<c>));
 	cudaMallocManaged(&res, sizeof(vec<r>));
 
-	*m = init_matrix<r,c>();
+	*m = init_mat<r,c>();
 	*v = init_vec<c>();
 
 	transform_vector_kernel<<<1,1>>>(m, v, res);
@@ -43,7 +43,7 @@ void transform_vector_cu() {
 
 template<size_t r, size_t c>
 void transform_vector_cpp() {
-	const matrix<r,c> m = init_matrix<r,c>();
+	const mat<r,c> m = init_mat<r,c>();
 	const vec<c> v = init_vec<c>();
 
 	vec<r> res = m * v;
@@ -73,7 +73,7 @@ struct transform_vector {
 	}
 
 	void transform_vector_example() {
-		matrix<3,3> m;
+		mat<3,3> m;
 		const vec<3> v{0, 1, 2};
 
 		for (int i = 0; i < 3; i++) {

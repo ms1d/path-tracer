@@ -9,7 +9,7 @@
 #endif
 
 template <size_t r, size_t c>
-struct matrix {
+struct mat {
 
 
 
@@ -17,11 +17,11 @@ struct matrix {
 
 
 
-	__host__ __device__ matrix() {}
+	__host__ __device__ mat() {}
 
 
 
-	__host__ __device__ matrix& operator+=(const matrix& other) {
+	__host__ __device__ mat& operator+=(const mat& other) {
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
 				data[i][j] += other.data[i][j];
@@ -31,15 +31,15 @@ struct matrix {
 		return *this;
 	}
 
-	__host__ __device__ matrix operator+(const matrix& other) const {
-		matrix res = *this;
+	__host__ __device__ mat operator+(const mat& other) const {
+		mat res = *this;
 		res += other;
 		return res;
 	}
 
 
 
-	__host__ __device__ matrix& operator-=(const matrix& other) {
+	__host__ __device__ mat& operator-=(const mat& other) {
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
 				data[i][j] -= other.data[i][j];
@@ -49,16 +49,16 @@ struct matrix {
 		return *this;
 	}
 
-	__host__ __device__ matrix operator-(const matrix& other) const {
-		matrix res = *this;
+	__host__ __device__ mat operator-(const mat& other) const {
+		mat res = *this;
 		res -= other;
 		return res;
 	}
 
 
 
-	__host__ __device__ matrix<r-1, c-1> get_minor(int row, int col) const requires(r > 1 && c > 1) {
-		matrix<r-1,c-1> res;
+	__host__ __device__ mat<r-1, c-1> get_minor(int row, int col) const requires(r > 1 && c > 1) {
+		mat<r-1,c-1> res;
 		int curr_row = 0;
 
 		for (int i = 0; i < r; i++) {
@@ -87,7 +87,7 @@ struct matrix {
 
 		int sign = 1;
 		for (int j = 0; j < c; j++) {
-			matrix<r-1,c-1> minor = get_minor(0, j);
+			mat<r-1,c-1> minor = get_minor(0, j);
 			det += sign * data[0][j] * minor.det();
 			sign *= -1;
 		}
@@ -97,7 +97,7 @@ struct matrix {
 
 
 
-	__host__ __device__ matrix& operator*=(float scalar) {
+	__host__ __device__ mat& operator*=(float scalar) {
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
 				data[i][j] *= scalar;
@@ -107,8 +107,8 @@ struct matrix {
 		return *this;
 	}
 
-	__host__ __device__ matrix operator*(float scalar) const {
-		matrix m = *this;
+	__host__ __device__ mat operator*(float scalar) const {
+		mat m = *this;
 		m *= scalar;
 		return m;
 	}
@@ -129,7 +129,7 @@ struct matrix {
 	}
 
 
-	__host__ __device__ bool operator==(const matrix& other) const {
+	__host__ __device__ bool operator==(const mat& other) const {
 		constexpr float epsilon = 2e-6;
 
 		for (int i = 0; i < r; i++) {
@@ -146,13 +146,13 @@ struct matrix {
 };
 
 template <size_t r, size_t c>
-__host__ __device__ matrix<r, c> operator*(float scalar, const matrix<r, c>& m) {
+__host__ __device__ mat<r, c> operator*(float scalar, const mat<r, c>& m) {
 	return m * scalar;
 }
 
 template<size_t r1, size_t r2, size_t c1, size_t c2>
-__host__ __device__ matrix<r1, c2> operator*(const matrix<r1, c1>& m1, const matrix<r2, c2>& m2) requires(c1 == r2) {
-	matrix<r1,c2> res;
+__host__ __device__ mat<r1, c2> operator*(const mat<r1, c1>& m1, const mat<r2, c2>& m2) requires(c1 == r2) {
+	mat<r1,c2> res;
 
 	for (size_t i = 0; i < r1; ++i) {
 		for (size_t j = 0; j < c2; ++j) {

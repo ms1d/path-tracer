@@ -1,29 +1,29 @@
 #include "../test_runner.h"
-#include "matrix.cuh"
+#include "mat.cuh"
 #include <cassert>
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
-__global__ void mult_matrix_kernel(const matrix<r1,c1>* m1, const matrix<r2,c2>* m2, matrix<r1,c2>* res) {
+__global__ void mult_mat_kernel(const mat<r1,c1>* m1, const mat<r2,c2>* m2, mat<r1,c2>* res) {
 	*res = *m1 * *m2;
 }
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
-void mult_matrix_cu() {
-	matrix<r1,c1> *m1;
-	matrix<r2,c2> *m2;
-	matrix<r1,c2> *res;
+void mult_mat_cu() {
+	mat<r1,c1> *m1;
+	mat<r2,c2> *m2;
+	mat<r1,c2> *res;
 
-	cudaMallocManaged(&m1, sizeof(matrix<r1,c1>));
-	cudaMallocManaged(&m2, sizeof(matrix<r2,c2>));
-	cudaMallocManaged(&res, sizeof(matrix<r1,c2>));
+	cudaMallocManaged(&m1, sizeof(mat<r1,c1>));
+	cudaMallocManaged(&m2, sizeof(mat<r2,c2>));
+	cudaMallocManaged(&res, sizeof(mat<r1,c2>));
 
-	*m1 = init_matrix<r1,c1>();
-    *m2 = init_matrix<r2,c2>();
+	*m1 = init_mat<r1,c1>();
+    *m2 = init_mat<r2,c2>();
 
-	mult_matrix_kernel<<<1,1>>>(m1, m2, res);
+	mult_mat_kernel<<<1,1>>>(m1, m2, res);
 	cudaDeviceSynchronize();
 
-	matrix<r1,c2> check_matrix;
+	mat<r1,c2> check_mat;
 
 	for (int i = 0; i < r1; i++) {
 		for (int j = 0; j < c2; j++) {
@@ -33,11 +33,11 @@ void mult_matrix_cu() {
 				sum += m1->data[i][k] * m2->data[k][j];
 			}
 
-			check_matrix.data[i][j] = sum;
+			check_mat.data[i][j] = sum;
 		}
 	}
 
-	assert(check_matrix == *res);
+	assert(check_mat == *res);
 	
 	cudaFree(m1);
 	cudaFree(m2);
@@ -45,11 +45,11 @@ void mult_matrix_cu() {
 }
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
-void mult_matrix_cpp() {
-	const matrix<r1,c1> m1 = init_matrix<r1,c1>();
-	const matrix<r2,c2> m2 = init_matrix<r2,c2>();
+void mult_mat_cpp() {
+	const mat<r1,c1> m1 = init_mat<r1,c1>();
+	const mat<r2,c2> m2 = init_mat<r2,c2>();
 
-	matrix<r1,c2> res = m1 * m2, check_matrix;
+	mat<r1,c2> res = m1 * m2, check_mat;
 
 	for (int i = 0; i < r1; i++) {
 		for (int j = 0; j < c2; j++) {
@@ -59,29 +59,29 @@ void mult_matrix_cpp() {
 				sum += m1.data[i][k] * m2.data[k][j];
 			}
 
-			check_matrix.data[i][j] = sum;
+			check_mat.data[i][j] = sum;
 		}
 	}
 
-	assert(check_matrix == res);
+	assert(check_mat == res);
 }
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>
-struct mult_matrix {
+struct mult_mat {
 	// Only need to test valid sizes
 	void operator()() requires(c1 != r2){}
 
 	void operator()() requires(c1 == r2) {
 		// Test for floating point accuracy on both CPU & GPU
-		mult_matrix_cpp<r1, c1, r2, c2>();
-		mult_matrix_cu<r1, c1, r2, c2>();
+		mult_mat_cpp<r1, c1, r2, c2>();
+		mult_mat_cu<r1, c1, r2, c2>();
 
 		// Hardcoded test for algorithm correctness
-		mult_matrix_example();
+		mult_mat_example();
 	}
 
-	void mult_matrix_example() {
-		matrix<3,3> m1, m2;
+	void mult_mat_example() {
+		mat<3,3> m1, m2;
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -90,7 +90,7 @@ struct mult_matrix {
 			}
 		}
 
-		matrix<3,3> res1 = m1 * m2, res2 = m2 * m1;
+		mat<3,3> res1 = m1 * m2, res2 = m2 * m1;
 
 		assert(res1 != res2);
 		assert(res1.data[0][0] == 0), assert(res2.data[0][0] == 0);
@@ -107,6 +107,6 @@ struct mult_matrix {
 };
 
 int main() {
-	run_tests<mult_matrix, 2, 16, 2, 16, 2, 16, 2, 16>();
+	run_tests<mult_mat, 2, 16, 2, 16, 2, 16, 2, 16>();
 }
 
