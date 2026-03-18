@@ -1,7 +1,11 @@
 #pragma once
 
+
+
 #include <iostream> // IWYU pragma: keep
 #include <cmath>
+
+
 
 #ifndef __host__
 #define __host__
@@ -10,14 +14,22 @@
 #define __device__
 #endif
 
-// Implements:
-// 1 - vector addition and subtraction + assignment operators
-// 2 - vector-scalar multiplication + assignment operators
-// 3 - dot product
-// 4 - cross product + assignment operator
-// 5 - is equal
-// vec_base is a base class that allows for more readable aliases
-// for specialised vectors (e.g. 2D x and y, 3D x, y and z, 4D x, y, z and w...)
+
+
+// Generic vector. Implements:
+//
+//		- Addition + Addition Assignment
+//		- Subtraction + Subtraction Assignment
+//
+//		- Scalar multiplication + assignment operators
+//		- Vector multiplication (Dot product)
+//
+//		- Equality test (with 2e-6 tolerance)
+//
+//		vec_base is a base class that allows for more readable aliases (via union)
+//		for specialised vectors (e.g. 2D x and y, 3D x, y and z, 4D x, y, z and w...)
+//		see vec<3> below
+
 template<size_t dim, class Derived>
 struct vec_base {
 
@@ -156,6 +168,9 @@ __host__ __device__ constexpr vec<dim> operator*(float scalar, const vec<dim>& v
 
 
 
+// 3D vector. Implements:
+//		- Cross product + assignment operator
+//		- clean x,y,z aliases
 template<>
 struct vec<3> : vec_base<3, vec<3>> {
 

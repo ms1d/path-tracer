@@ -6,8 +6,11 @@ Provides a template-based matrix structure with sizes defined at compile-time.
 ## Features
 
 - **CUDA Compatible**: All methods are marked `__host__ __device__`.
+
 - **Compile-time Sizing**: Rows and columns are template parameters.
+
 - **Precision**: Equality tests use a default epsilon of `2e-6`.
+
 - **Determinants**: Supports square matrices using Laplace expansion.
 
 ## Method Signatures

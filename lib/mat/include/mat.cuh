@@ -16,7 +16,7 @@
 
 
 
-// Generic r by c matrix. Supports:
+// Generic r by c matrix. Implements:
 //
 //		- Addition + Addition assignment
 //		- Subtraction + Subtraction assignment
@@ -33,7 +33,7 @@
 //
 //		- Equality test (with 2e-6 tolerance)
 //
-//		- (TBI) Inverse
+//		- (TBI) Inverse + LU decomposition
 
 template <size_t r, size_t c>
 struct mat {
