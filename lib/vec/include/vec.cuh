@@ -27,26 +27,26 @@ struct vec_base {
 
 
 
-    __host__ __device__ float* derived_data() { return static_cast<Derived*>(this)->data; }
-    __host__ __device__ const float* derived_data() const { return static_cast<const Derived*>(this)->data; }
+    __host__ __device__ constexpr float* derived_data() { return static_cast<Derived*>(this)->data; }
+    __host__ __device__ constexpr const float* derived_data() const { return static_cast<const Derived*>(this)->data; }
 
     
 
-	__host__ __device__ vec_base() {}
-    __host__ __device__ vec_base(const float (&new_data)[dim]) {
+	__host__ __device__ constexpr vec_base() {}
+    __host__ __device__ constexpr vec_base(const float (&new_data)[dim]) {
         float* d = derived_data();
         for (size_t i = 0; i < dim; i++) d[i] = new_data[i];
     }
 
 
 
-	__host__ __device__ float operator[](int i) const {
+	__host__ __device__ constexpr float operator[](int i) const {
 		return derived_data()[i];
 	}
 
 
 
-    __host__ __device__ float mag() const {
+    __host__ __device__ constexpr float mag() const {
         const float* d = derived_data();
         float sum = 0;
         for (size_t i = 0; i < dim; i++) sum += d[i] * d[i];
@@ -55,13 +55,13 @@ struct vec_base {
 
 
 
-    __host__ __device__ Derived operator+(const Derived& other) const {
+    __host__ __device__ constexpr Derived operator+(const Derived& other) const {
         Derived v = static_cast<const Derived&>(*this);
         v += other;
         return v;
     }
     
-	__host__ __device__ Derived& operator+=(const Derived& other) {
+	__host__ __device__ constexpr Derived& operator+=(const Derived& other) {
         float* d = derived_data();
         for (size_t i = 0; i < dim; i++) d[i] += other.data[i];
         return static_cast<Derived&>(*this);
@@ -69,13 +69,13 @@ struct vec_base {
 
 
 
-    __host__ __device__ Derived operator-(const Derived& other) const {
+    __host__ __device__ constexpr Derived operator-(const Derived& other) const {
         Derived v = static_cast<const Derived&>(*this);
         v -= other;
         return v;
     }
     
-	__host__ __device__ Derived& operator-=(const Derived& other) {
+	__host__ __device__ constexpr Derived& operator-=(const Derived& other) {
         float* d = derived_data();
         for (size_t i = 0; i < dim; i++) d[i] -= other.data[i];
         return static_cast<Derived&>(*this);
@@ -83,14 +83,14 @@ struct vec_base {
 
 
 
-    __host__ __device__ float operator*(const Derived& other) const { // dot
+    __host__ __device__ constexpr float operator*(const Derived& other) const { // dot
         const float* d = derived_data();
         float sum = 0;
         for (size_t i = 0; i < dim; i++) sum += d[i] * other.data[i];
         return sum;
     }
 
-    __host__ __device__ Derived& operator*=(float scalar) {
+    __host__ __device__ constexpr Derived& operator*=(float scalar) {
         float* d = derived_data();
         for (size_t i = 0; i < dim; i++) d[i] *= scalar;
         return static_cast<Derived&>(*this);
@@ -113,7 +113,7 @@ struct vec_base {
 
 
 
-	__host__ __device__ bool operator==(const vec_base<dim, Derived>& rhs) const {
+	__host__ __device__ constexpr bool operator==(const vec_base<dim, Derived>& rhs) const {
 		const float* ld = derived_data();
 		const float* rd = rhs.derived_data();
 		constexpr float epsilon = 2e-6f;
@@ -124,7 +124,7 @@ struct vec_base {
 
 
 
-	__host__ __device__ Derived operator*(float scalar) const {
+	__host__ __device__ constexpr Derived operator*(float scalar) const {
 		Derived result = static_cast<const Derived&>(*this);
 		result *= scalar;
 		return result;
@@ -152,7 +152,7 @@ struct vec : vec_base<dim, vec<dim>> {
 
 // float * scalar must be a non-member function
 template<size_t dim>
-__host__ __device__ inline vec<dim> operator*(float scalar, const vec<dim>& v) { return v * scalar; }
+__host__ __device__ constexpr vec<dim> operator*(float scalar, const vec<dim>& v) { return v * scalar; }
 
 
 
@@ -173,13 +173,13 @@ struct vec<3> : vec_base<3, vec<3>> {
 
 
 
-    __host__ __device__ vec() {}
+    __host__ __device__ constexpr vec() {}
 
-    __host__ __device__ vec(float x, float y, float z) : x(x), y(y), z(z) {}
+    __host__ __device__ constexpr vec(float x, float y, float z) : x(x), y(y), z(z) {}
 
-	__host__ __device__ vec(const vec& other) : x(other.x), y(other.y), z(other.z) {}
+	__host__ __device__ constexpr vec(const vec& other) : x(other.x), y(other.y), z(other.z) {}
 
-    __host__ __device__ vec& operator=(const vec& other) {
+    __host__ __device__ constexpr vec& operator=(const vec& other) {
 		x = other.x; y = other.y; z = other.z;
 		return *this;
 	}
@@ -187,12 +187,12 @@ struct vec<3> : vec_base<3, vec<3>> {
 
 
     // Cross product
-    __host__ __device__ vec operator^(const vec& other) const {
+    __host__ __device__ constexpr vec operator^(const vec& other) const {
         vec res = *this;
         res ^= other;
         return res;
     }
-    __host__ __device__ vec& operator^=(const vec& other) {
+    __host__ __device__ constexpr vec& operator^=(const vec& other) {
         float _x = x, _y = y, _z = z;
         x = _y * other.z - _z * other.y;
         y = _z * other.x - _x * other.z;
@@ -205,20 +205,20 @@ struct vec<3> : vec_base<3, vec<3>> {
 	// Explicit redifinitions of operators to help clangd LSP
 	// in .cu files. Compiler will optimise these out fully.
 	// It struggles finding CRTP base methods through vec_base
-	__host__ __device__ vec<3> operator+(const vec<3>& other) const { return base::operator+(other); }
-	__host__ __device__ vec<3>& operator+=(const vec<3>& other) { return base::operator+=(other); }
+	__host__ __device__ constexpr vec<3> operator+(const vec<3>& other) const { return base::operator+(other); }
+	__host__ __device__ constexpr vec<3>& operator+=(const vec<3>& other) { return base::operator+=(other); }
 
-	__host__ __device__ vec<3> operator-(const vec<3>& other) const { return base::operator-(other); }
-	__host__ __device__ vec<3>& operator-=(const vec<3>& other) { return base::operator-=(other); }
+	__host__ __device__ constexpr vec<3> operator-(const vec<3>& other) const { return base::operator-(other); }
+	__host__ __device__ constexpr vec<3>& operator-=(const vec<3>& other) { return base::operator-=(other); }
 
-	__host__ __device__ float operator*(const vec<3>& other) const { return base::operator*(other); }
-	__host__ __device__ vec<3>& operator*=(float scalar) { return base::operator*=(scalar); }
-	__host__ __device__ vec<3> operator*(float scalar) const { return base::operator*(scalar); }
+	__host__ __device__ constexpr float operator*(const vec<3>& other) const { return base::operator*(other); }
+	__host__ __device__ constexpr vec<3>& operator*=(float scalar) { return base::operator*=(scalar); }
+	__host__ __device__ constexpr vec<3> operator*(float scalar) const { return base::operator*(scalar); }
 
-	__host__ __device__ float operator[](int i) const { return base::operator[](i); }
-	__host__ __device__ float mag() const { return base::mag(); }
+	__host__ __device__ constexpr float operator[](int i) const { return base::operator[](i); }
+	__host__ __device__ constexpr float mag() const { return base::mag(); }
 
-	__host__ __device__ bool operator==(const vec<3>& other) const { return base::operator==(other); }
+	__host__ __device__ constexpr bool operator==(const vec<3>& other) const { return base::operator==(other); }
 
 
 

@@ -22,7 +22,7 @@ struct mat {
 
 
 
-	__host__ __device__ mat& operator+=(const mat& other) {
+	__host__ __device__ constexpr mat& operator+=(const mat& other) {
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
 				data[i][j] += other.data[i][j];
@@ -32,7 +32,7 @@ struct mat {
 		return *this;
 	}
 
-	__host__ __device__ mat operator+(const mat& other) const {
+	__host__ __device__ constexpr mat operator+(const mat& other) const {
 		mat res = *this;
 		res += other;
 		return res;
@@ -40,7 +40,7 @@ struct mat {
 
 
 
-	__host__ __device__ mat& operator-=(const mat& other) {
+	__host__ __device__ constexpr mat& operator-=(const mat& other) {
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
 				data[i][j] -= other.data[i][j];
@@ -50,7 +50,7 @@ struct mat {
 		return *this;
 	}
 
-	__host__ __device__ mat operator-(const mat& other) const {
+	__host__ __device__ constexpr mat operator-(const mat& other) const {
 		mat res = *this;
 		res -= other;
 		return res;
@@ -58,7 +58,7 @@ struct mat {
 
 
 
-	__host__ __device__ mat<r-1, c-1> get_minor(int row, int col) const requires(r > 1 && c > 1) {
+	__host__ __device__ constexpr mat<r-1, c-1> get_minor(int row, int col) const requires(r > 1 && c > 1) {
 		mat<r-1,c-1> res;
 		int curr_row = 0;
 
@@ -82,8 +82,8 @@ struct mat {
 
 
 
-	__host__ __device__ float det() const requires(r == c && r == 2) { return data[0][0] * data[1][1] - data[0][1] * data[1][0]; }
-	__host__ __device__ float det() const requires(r == c && r > 2){
+	__host__ __device__ constexpr float det() const requires(r == c && r == 2) { return data[0][0] * data[1][1] - data[0][1] * data[1][0]; }
+	__host__ __device__ constexpr float det() const requires(r == c && r > 2){
 		float det = 0;
 
 		int sign = 1;
@@ -98,7 +98,7 @@ struct mat {
 
 
 
-	__host__ __device__ mat transpose_inplace() requires(r == c) {
+	__host__ __device__ constexpr mat transpose_inplace() requires(r == c) {
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
 				std::swap(data[i][j], data[j][i]);
@@ -110,7 +110,7 @@ struct mat {
 
 
 
-	__host__ __device__ mat transpose() const {
+	__host__ __device__ constexpr mat transpose() const {
 		mat<c,r> res;
 		
 		for (int i = 0; i < r; i++) {
@@ -123,7 +123,7 @@ struct mat {
 	}
 
 
-	__host__ __device__ mat& operator*=(float scalar) {
+	__host__ __device__ constexpr mat& operator*=(float scalar) {
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
 				data[i][j] *= scalar;
@@ -133,7 +133,7 @@ struct mat {
 		return *this;
 	}
 
-	__host__ __device__ mat operator*(float scalar) const {
+	__host__ __device__ constexpr mat operator*(float scalar) const {
 		mat m = *this;
 		m *= scalar;
 		return m;
@@ -141,7 +141,7 @@ struct mat {
 
 
 
-	__host__ __device__ vec<r> operator*(const vec<c>& v) const {
+	__host__ __device__ constexpr vec<r> operator*(const vec<c>& v) const {
 		vec<r> res;
 
 		for (size_t i = 0; i < r; ++i) {
@@ -155,7 +155,7 @@ struct mat {
 	}
 
 
-	__host__ __device__ bool operator==(const mat& other) const {
+	__host__ __device__ constexpr bool operator==(const mat& other) const {
 		constexpr float epsilon = 2e-6;
 
 		for (int i = 0; i < r; i++) {
@@ -172,12 +172,12 @@ struct mat {
 };
 
 template <size_t r, size_t c>
-__host__ __device__ mat<r, c> operator*(float scalar, const mat<r, c>& m) {
+__host__ __device__ constexpr mat<r, c> operator*(float scalar, const mat<r, c>& m) {
 	return m * scalar;
 }
 
 template<size_t r1, size_t r2, size_t c1, size_t c2>
-__host__ __device__ mat<r1, c2> operator*(const mat<r1, c1>& m1, const mat<r2, c2>& m2) requires(c1 == r2) {
+__host__ __device__ constexpr mat<r1, c2> operator*(const mat<r1, c1>& m1, const mat<r2, c2>& m2) requires(c1 == r2) {
 	mat<r1,c2> res;
 
 	for (size_t i = 0; i < r1; ++i) {
