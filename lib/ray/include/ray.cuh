@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 #ifndef __host__
 #define __host__
 #endif
@@ -7,17 +9,97 @@
 #define __device__
 #endif
 
+
+
 #include "vec.cuh"
-#include <iostream>
+#include <iostream> // IWYU pragma: keep
 
-struct Ray {
-	public:
-		vec<3> origin;
-        vec<3> direction;
 
-		__host__ __device__ Ray(const vec<3>& origin, const vec<3>& direction);
 
-		__host__ __device__ vec<3> GetPoint(float t) const;
+struct ray {
 
-		friend std::ostream& operator<<(std::ostream& os, const Ray& v);
+
+
+	vec<3> o;
+	vec<3> dir;
+	const float epsilon = 2e-6f;
+
+
+
+	__host__ __device__ constexpr ray(const vec<3>& origin, const vec<3>& direction) : o(origin), dir(direction) {}
+
+
+
+	// Added a redundant is_equal bool to make clangd lsp not throw false error
+	// Compiler should optimise this away
+	__host__ __device__ constexpr vec<3> get_point(float t) const {
+		vec<3> res = o + dir * t;
+		return res;
+	}
+
+
+	// Moller-Trumbore intersection algorithm - returns the value of t such that the ray and triangle intersect
+	__host__ __device__ constexpr float get_tri_intersect(const vec<3>& v1, const vec<3>& v2, const vec<3>& v3) const {
+		vec<3> e1 = v2 - v1;
+        vec<3> e2 = v3 - v1;
+
+		vec<3> h = dir ^ e2;
+        float a = h * e1;
+
+	    if (__builtin_fabsf(a) < epsilon) return -1;
+		
+		float f = 1.0f / a;
+		vec<3> s = o - v1;
+		float u = f * (s * h);	
+        
+		vec<3> q = s ^ e1;
+        float v = f * (dir * q);
+        
+		return v < 0.0f || u + v > 1.0f || __builtin_fabsf(u) > 1 ? -1 : f * (e2 * q);
+	}
+
+
+
+	// Standard linear algebra formula, defining a plane as a normal and a point on it
+	__host__ __device__ constexpr float get_plane_intersect(const vec<3>& p, const vec<3>& n) const {
+		float den = dir * n;
+		if (__builtin_fabsf(den) < epsilon) return -1;
+		return (p * n - o * n) / den;
+	}
+
+
+
+	// Added a redundant is_equal bool to make clangd lsp not throw false error
+	// Compiler should optimise this away
+	__host__ __device__ constexpr bool operator==(const ray& other) const {
+		bool is_equal = dir == other.dir && o == other.o;
+		return is_equal;
+	}
+
+
+
+	__host__ __device__ constexpr ray reflect(const vec<3>& p, const vec<3>& n) const {
+		ray r = *this;
+		r.reflect_inplace(p, n);
+		return r;
+	}
+
+	__host__ __device__ constexpr ray& reflect_inplace(const vec<3>& p, const vec<3>& n) {
+		float t = get_plane_intersect(p, n) * 2;
+		vec<3> o_prime = o + dir * t;
+		o = o_prime; dir = p - o_prime;
+		return *this;
+	}
+
+
+
+#ifndef __CUDA_ARCH__
+	friend std::ostream& operator<<(std::ostream& os, const ray& r) {
+		os << "Origin: " << r.o << '\n' << "Direction: " << r.dir << std::endl;
+		return os;
+	}
+#endif
+
+
+
 };

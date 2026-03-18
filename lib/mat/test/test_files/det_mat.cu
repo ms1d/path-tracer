@@ -20,7 +20,7 @@ void det_mat_cu() {
 	det_mat_kernel<<<1,1>>>(m, det);
 	cudaDeviceSynchronize();
 
-	assert(fabs(*det - m->det()) < epsilon);
+	assert(__builtin_fabsf(*det - m->det()) < epsilon);
 
 	cudaFree(m);
 	cudaFree(det);
@@ -31,7 +31,7 @@ void det_mat_cpp() {
     const mat<r,c> m = init_mat<r,c>();
 	float det = m.det();
 
-	assert(fabs(det - m.det()) < epsilon);
+	assert(__builtin_fabsf(det - m.det()) < epsilon);
 }
 
 template<size_t r1, size_t c1, size_t r2, size_t c2>

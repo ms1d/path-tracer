@@ -3,7 +3,6 @@
 
 
 #include <iostream> // IWYU pragma: keep
-#include <cmath>
 
 
 
@@ -62,7 +61,7 @@ struct vec_base {
         const float* d = derived_data();
         float sum = 0;
         for (size_t i = 0; i < dim; i++) sum += d[i] * d[i];
-        return sqrt(sum);
+        return __builtin_sqrtf(sum);
     }
 
 
@@ -130,7 +129,7 @@ struct vec_base {
 		const float* rd = rhs.derived_data();
 		constexpr float epsilon = 2e-6f;
 
-		for (size_t i = 0; i < dim; i++) if (fabs(ld[i] - rd[i]) > epsilon) return false;
+		for (size_t i = 0; i < dim; i++) if (__builtin_fabsf(ld[i] - rd[i]) > epsilon) return false;
 		return true;
 	}
 

@@ -1,6 +1,5 @@
 #include "vec.cuh"
 #include "../test_runner.h"
-#include <cmath>
 #include <cassert>
 
 template<size_t dim>
@@ -23,9 +22,9 @@ void mag_vec_cu() {
 	
 	float sum = 0;
 	for (size_t i = 0; i < dim; i++) sum += v1->data[i] * v1->data[i];
-	sum = std::sqrt(sum);
+	sum = __builtin_sqrtf(sum);
 
-	assert(fabs(sum - *mag) < epsilon);
+	assert(__builtin_fabsf(sum - *mag) < epsilon);
 
 	cudaFree(v1);
 	cudaFree(mag);
@@ -38,9 +37,9 @@ void mag_vec_cpp() {
 
 	float sum = 0;
 	for (size_t i = 0; i < dim; i++) sum += v1.data[i] * v1.data[i];
-	sum = std::sqrt(sum);
+	sum = __builtin_sqrtf(sum);
 
-	assert(fabs(sum - mag) < epsilon);
+	assert(__builtin_fabsf(sum - mag) < epsilon);
 }
 
 template<size_t dim>
@@ -56,7 +55,7 @@ struct mag_vec {
 
 	void mag_vec_example() {
 		vec<3> v{1,2,3};
-		assert(fabs(v.mag() - std::sqrt(14)) < epsilon);
+		assert(__builtin_fabsf(v.mag() - __builtin_sqrtf(14)) < epsilon);
 	}
 };
 

@@ -44,10 +44,6 @@ struct mat {
 
 
 
-	__host__ __device__ mat() {}
-
-
-
 	__host__ __device__ constexpr mat& operator+=(const mat& other) {
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
@@ -124,7 +120,7 @@ struct mat {
 
 
 
-	__host__ __device__ constexpr mat transpose_inplace() requires(r == c) {
+	__host__ __device__ constexpr mat& transpose_inplace() requires(r == c) {
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
 				std::swap(data[i][j], data[j][i]);
@@ -186,7 +182,7 @@ struct mat {
 
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
-				if (fabs(data[i][j] - other.data[i][j]) > epsilon) return false;
+				if (__builtin_fabsf(data[i][j] - other.data[i][j]) > epsilon) return false;
 			}
 		}
 
