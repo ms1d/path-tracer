@@ -3,6 +3,7 @@
 
 
 #include "vec.cuh"
+#include "precision.cuh"
 #include <utility>
 
 
@@ -31,7 +32,7 @@
 //
 //		- Generating minor matrices (row to leave out, collumn to leave out)
 //
-//		- Equality test (with 2e-6 tolerance)
+//		- Equality test (with strict tolerance)
 //
 //		- (TBI) Inverse + LU decomposition
 
@@ -122,7 +123,7 @@ struct mat {
 
 	__host__ __device__ constexpr mat& transpose_inplace() requires(r == c) {
 		for (int i = 0; i < r; i++) {
-			for (int j = 0; j < c; j++) {
+			for (int j = i+1; j < c; j++) {
 				std::swap(data[i][j], data[j][i]);
 			}
 		}
@@ -143,6 +144,7 @@ struct mat {
 
 		return res;
 	}
+
 
 
 	__host__ __device__ constexpr mat& operator*=(float scalar) {
@@ -177,12 +179,11 @@ struct mat {
 	}
 
 
-	__host__ __device__ constexpr bool operator==(const mat& other) const {
-		constexpr float epsilon = 2e-6;
 
+	__host__ __device__ constexpr bool operator==(const mat& other) const {
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
-				if (__builtin_fabsf(data[i][j] - other.data[i][j]) > epsilon) return false;
+				if (!math_precision::nearly_equal(data[i][j], other.data[i][j])) return false;
 			}
 		}
 

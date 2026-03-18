@@ -12,17 +12,23 @@
 
 
 #include "vec.cuh"
+#include "precision.cuh"
 #include <iostream> // IWYU pragma: keep
 
-
-
+// Generic 3D Ray. Implements:
+//
+//		- Ray-Triangle intersection (Moller-Trumbore)
+//		- Ray-Plane intersection
+//		- Point on ray calculation
+//		- Reflection logic
+//
+//		- Equality test (with strict tolerance)
+//
 struct ray {
-
 
 
 	vec<3> o;
 	vec<3> dir;
-	const float epsilon = 2e-6f;
 
 
 
@@ -30,8 +36,8 @@ struct ray {
 
 
 
-	// Added a redundant is_equal bool to make clangd lsp not throw false error
-	// Compiler should optimise this away
+	// Redundant res temporary here to suppress clangd error
+	// Compiler should optimise it away
 	__host__ __device__ constexpr vec<3> get_point(float t) const {
 		vec<3> res = o + dir * t;
 		return res;
@@ -46,16 +52,20 @@ struct ray {
 		vec<3> h = dir ^ e2;
         float a = h * e1;
 
-	    if (__builtin_fabsf(a) < epsilon) return -1;
+	    if (__builtin_fabsf(a) < math_precision::epsilon) return -1;
 		
 		float f = 1.0f / a;
 		vec<3> s = o - v1;
-		float u = f * (s * h);	
+		float u = f * (s * h);
+        
+		if (__builtin_fabsf(u) > 1) return -1;
         
 		vec<3> q = s ^ e1;
         float v = f * (dir * q);
         
-		return v < 0.0f || u + v > 1.0f || __builtin_fabsf(u) > 1 ? -1 : f * (e2 * q);
+		if (v < 0.0f || u + v > 1.0f) return -1;
+        
+		return f * (e2 * q);
 	}
 
 
@@ -63,17 +73,17 @@ struct ray {
 	// Standard linear algebra formula, defining a plane as a normal and a point on it
 	__host__ __device__ constexpr float get_plane_intersect(const vec<3>& p, const vec<3>& n) const {
 		float den = dir * n;
-		if (__builtin_fabsf(den) < epsilon) return -1;
+		if (__builtin_fabsf(den) < math_precision::epsilon) return -1;
 		return (p * n - o * n) / den;
 	}
 
 
 
-	// Added a redundant is_equal bool to make clangd lsp not throw false error
-	// Compiler should optimise this away
+	// Redundant res temporary here to suppress clangd error
+	// Compiler should optimise it away
 	__host__ __device__ constexpr bool operator==(const ray& other) const {
-		bool is_equal = dir == other.dir && o == other.o;
-		return is_equal;
+		bool res = o == other.o && dir == other.dir;
+		return res;
 	}
 
 
@@ -83,6 +93,8 @@ struct ray {
 		r.reflect_inplace(p, n);
 		return r;
 	}
+
+
 
 	__host__ __device__ constexpr ray& reflect_inplace(const vec<3>& p, const vec<3>& n) {
 		float t = get_plane_intersect(p, n) * 2;

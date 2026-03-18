@@ -3,6 +3,7 @@
 
 
 #include <iostream> // IWYU pragma: keep
+#include "precision.cuh"
 
 
 
@@ -23,7 +24,7 @@
 //		- Scalar multiplication + assignment operators
 //		- Vector multiplication (Dot product)
 //
-//		- Equality test (with 2e-6 tolerance)
+//		- Equality test (with strict tolerance)
 //
 //		vec_base is a base class that allows for more readable aliases (via union)
 //		for specialised vectors (e.g. 2D x and y, 3D x, y and z, 4D x, y, z and w...)
@@ -41,7 +42,7 @@ struct vec_base {
     __host__ __device__ constexpr float* derived_data() { return static_cast<Derived*>(this)->data; }
     __host__ __device__ constexpr const float* derived_data() const { return static_cast<const Derived*>(this)->data; }
 
-    
+
 
 	__host__ __device__ constexpr vec_base() {}
     __host__ __device__ constexpr vec_base(const float (&new_data)[dim]) {
@@ -101,6 +102,8 @@ struct vec_base {
         return sum;
     }
 
+
+
     __host__ __device__ constexpr Derived& operator*=(float scalar) {
         float* d = derived_data();
         for (size_t i = 0; i < dim; i++) d[i] *= scalar;
@@ -109,27 +112,11 @@ struct vec_base {
 
 
 
-#ifndef __CUDA_ARCH__
-    friend std::ostream& operator<<(std::ostream& os, const Derived& v) {
-        const float* d = v.derived_data();
-        os << "(";
-        const char* sep = "";
-        for (size_t i = 0; i < dim; i++) {
-            os << sep << d[i];
-            sep = ", ";
-        }
-        return os << ")";
-    }
-#endif
-
-
-
 	__host__ __device__ constexpr bool operator==(const vec_base<dim, Derived>& rhs) const {
 		const float* ld = derived_data();
 		const float* rd = rhs.derived_data();
-		constexpr float epsilon = 2e-6f;
 
-		for (size_t i = 0; i < dim; i++) if (__builtin_fabsf(ld[i] - rd[i]) > epsilon) return false;
+		for (size_t i = 0; i < dim; i++) if (!math_precision::nearly_equal(ld[i], rd[i])) return false;
 		return true;
 	}
 
@@ -161,9 +148,28 @@ struct vec : vec_base<dim, vec<dim>> {
 
 
 
-// float * scalar must be a non-member function
+
+// float * scalar must be a non-member function to allow float on lhs
 template<size_t dim>
 __host__ __device__ constexpr vec<dim> operator*(float scalar, const vec<dim>& v) { return v * scalar; }
+
+
+
+// Suppress clangd errors
+#ifndef __CUDA_ARCH__
+template<size_t dim> 
+constexpr std::ostream& operator<<(std::ostream& os, const vec<dim>& v) {
+	const float* d = v.data;
+	os << "(";
+	const char* sep = "";
+	for (size_t i = 0; i < dim; i++) {
+		os << sep << d[i];
+		sep = ", ";
+	}
+	return os << ")";
+}
+#endif
+
 
 
 
@@ -200,6 +206,7 @@ struct vec<3> : vec_base<3, vec<3>> {
 
 
 
+
     // Cross product
     __host__ __device__ constexpr vec operator^(const vec& other) const {
         vec res = *this;
@@ -213,6 +220,7 @@ struct vec<3> : vec_base<3, vec<3>> {
         z = _x * other.y - _y * other.x;
         return *this;
     }
+
 
 
 
@@ -233,6 +241,15 @@ struct vec<3> : vec_base<3, vec<3>> {
 	__host__ __device__ constexpr float mag() const { return base::mag(); }
 
 	__host__ __device__ constexpr bool operator==(const vec<3>& other) const { return base::operator==(other); }
+
+
+
+
+	// Explicit implementation for vec<3>
+	friend std::ostream& operator<<(std::ostream& os, const vec<3>& v) {
+		os << "(" << v.x << "," << v.y << "," << v.z << ")";
+		return os;
+	}
 
 
 

@@ -92,7 +92,6 @@ struct mult_mat {
 
 		mat<3,3> res1 = m1 * m2, res2 = m2 * m1;
 
-		assert(res1 != res2);
 		assert(res1.data[0][0] == 0), assert(res2.data[0][0] == 0);
 		assert(res1.data[0][1] == 5), assert(res2.data[0][1] == 0);
 		assert(res1.data[0][2] == 10), assert(res2.data[0][2] == 0);

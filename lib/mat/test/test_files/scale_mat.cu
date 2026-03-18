@@ -76,7 +76,6 @@ struct scale_mat {
 
 		mat<3,3> res1 = m * scalar, res2 = scalar * m;
 
-		assert(res1 == res2);
 		assert(res1.data[0][0] == 0);
 		assert(res1.data[0][1] == 2);
 		assert(res1.data[0][2] == 4);
@@ -86,6 +85,7 @@ struct scale_mat {
 		assert(res1.data[2][0] == 4);
 		assert(res1.data[2][1] == 6);
 		assert(res1.data[2][2] == 8);
+		assert(res1 == res2);
 	}
 };
 

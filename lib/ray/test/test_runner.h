@@ -3,7 +3,6 @@
 
 inline std::mt19937 rng(std::random_device{}());
 inline std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
-constexpr float epsilon = 2e-6;
 
 ray init_ray() {
 	vec<3> o, d;
@@ -19,7 +18,7 @@ ray init_ray() {
 
 template<class Test, int remaining_trials>
 void run_tests() {
-	while (remaining_trials > 0) {
+	if constexpr (remaining_trials > 0) {
         Test{}();
 		run_tests<Test, remaining_trials - 1>();
     }

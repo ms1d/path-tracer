@@ -24,7 +24,7 @@ void mag_vec_cu() {
 	for (size_t i = 0; i < dim; i++) sum += v1->data[i] * v1->data[i];
 	sum = __builtin_sqrtf(sum);
 
-	assert(__builtin_fabsf(sum - *mag) < epsilon);
+	assert(math_precision::nearly_equal(sum, *mag));
 
 	cudaFree(v1);
 	cudaFree(mag);
@@ -39,7 +39,7 @@ void mag_vec_cpp() {
 	for (size_t i = 0; i < dim; i++) sum += v1.data[i] * v1.data[i];
 	sum = __builtin_sqrtf(sum);
 
-	assert(__builtin_fabsf(sum - mag) < epsilon);
+	assert(math_precision::nearly_equal(sum, mag));
 }
 
 template<size_t dim>
@@ -55,7 +55,7 @@ struct mag_vec {
 
 	void mag_vec_example() {
 		vec<3> v{1,2,3};
-		assert(__builtin_fabsf(v.mag() - __builtin_sqrtf(14)) < epsilon);
+		assert(math_precision::nearly_equal(v.mag(), __builtin_sqrtf(14)));
 	}
 };
 

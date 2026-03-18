@@ -27,7 +27,7 @@ void dot_vec_cu() {
 	for (size_t i = 0; i < dim; i++)
 		sum += v1->data[i] * v2->data[i];
 	
-	assert(__builtin_fabsf(sum - *dot) < epsilon);
+	assert(math_precision::nearly_equal(sum, *dot));
 
 	cudaFree(v1);
 	cudaFree(v2);
@@ -44,7 +44,7 @@ void dot_vec_cpp() {
 	for (size_t i = 0; i < dim; i++)
 		sum += v1.data[i] * v2.data[i];
 
-	assert(__builtin_fabsf(sum - dot) < epsilon);
+	assert(math_precision::nearly_equal(sum, dot));
 }
 
 template<size_t dim>
