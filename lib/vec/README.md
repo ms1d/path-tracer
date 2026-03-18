@@ -2,7 +2,7 @@
 
 A header-only, multi-dimensional vector library for CUDA and C++.
 It uses the Curiously Recurring Template Pattern (CRTP) to provide a
-base class for specialized vector types (e.g., 2D, 3D).
+base class for specialized vector types (e.g. 3D).
 
 ## Features
 
