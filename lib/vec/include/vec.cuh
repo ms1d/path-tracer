@@ -244,13 +244,13 @@ struct vec<3> : vec_base<3, vec<3>> {
 
 
 
-
+#ifndef __CUDA_ARCH__
 	// Explicit implementation for vec<3>
 	friend std::ostream& operator<<(std::ostream& os, const vec<3>& v) {
 		os << "(" << v.x << "," << v.y << "," << v.z << ")";
 		return os;
 	}
-
+#endif
 
 
 };

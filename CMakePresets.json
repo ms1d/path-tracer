@@ -8,7 +8,9 @@
 			"binaryDir": "build/dev",
 			"cacheVariables": {
 				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-				"BUILD_TESTS": "ON"
+				"BUILD_TESTS": "ON",
+				"CMAKE_CXX_FLAGS": "-g -Wall -Wextra -Wpedantic -Og",
+				"CMAKE_CUDA_FLAGS": "-g -G -lineinfo -Xcompiler -Wall"
 			}
 		},
 
@@ -20,7 +22,9 @@
 			"cacheVariables": {
 				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
 				"CMAKE_BUILD_TYPE": "Release",
-				"BUILD_TESTS": "OFF"
+				"BUILD_TESTS": "OFF",
+				"CMAKE_CXX_FLAGS": "-O3 -DNDEBUG -flto",
+				"CMAKE_CUDA_FLAGS": "-O3 --use_fast_math -Xcompiler"
 			}
 		}
 	],
