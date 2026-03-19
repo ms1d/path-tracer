@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-#
+
 project(path-tracer-cpp LANGUAGES CXX CUDA)
 
 find_program(CCACHE_PROGRAM ccache)
