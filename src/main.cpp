@@ -25,25 +25,17 @@ void sig_handler(int _) {
 	_exit(1);
 }
 
-pid_t spawn(const char *path, const char *nice_name) {
-	status_json[nice_name] = "starting...";
+pid_t spawn(const char *path) {
     pid_t pid = fork();
 
 	if (pid == 0) {
-		execl(path, nice_name, (char *)NULL);
+		execl(path, path, (char *)NULL);
 		perror("execl failed");
 		_exit(1);
 	}
 
-	if (pid > 0) {
-		status_json[nice_name] = "running";
-	}
-
-	if (pid < 0) {
-        perror("fork failed");
-		status_json[nice_name] = "fork failed";
-    }
-
+	if (pid < 0) perror("fork failed");
+    
 	children.push_back(pid);
 
     return pid;
@@ -55,13 +47,19 @@ int main() {
 	atexit(kill_children);
 
 	std::system("mkdir -p state && touch state/status.json");
-    pid_t http_pid = spawn("./http-server/http-server", "http");
-    pid_t udp_pid  = spawn("./udp-server/udp-server", "udp");
+    pid_t http_pid = spawn("./http-server/http-server");
+    pid_t udp_pid  = spawn("./udp-server/udp-server");
 
     while (true) {
-        if (http_pid <= 0) http_pid = spawn("./http-server/http-server", "http");
+        if (http_pid <= 0) {
+			http_pid = spawn("./http-server/http-server");
+			status_json["http"] = "dead! restarting...";
+		} else status_json["http"] = "running";
 
-        if (udp_pid <= 0) udp_pid = spawn("./udp-server/udp-server", "udp");
+        if (udp_pid <= 0) {
+			udp_pid = spawn("./udp-server/udp-server");
+			status_json["udp"] = "dead! restarting...";
+		} else status_json["udp"] = "running";
 
         int status;
         pid_t r;
@@ -92,6 +90,6 @@ int main() {
 
 		file.close();
 
-        sleep(5);
+        sleep(1);
     }
 }
