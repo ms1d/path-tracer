@@ -42,6 +42,9 @@ compile_commands.json
 # clangd config
 .clangd
 
+# marksman config
+.markdownlint.json
+
 # Helper scripts at project root
 /test
 /test-failed

@@ -12,9 +12,10 @@ int main() {
 	middleware mw;
 
 	// Register middleware here
+	// Order matters! (FILO)
 	mw.add_middleware(check_json, [](const Request&, Response&) {});
 
-	// Call endpoints
+	// Call endpoints. MUST wrap to use middleware
 	svr.Get("/health", mw.wrap_endpoint("/health", health));
 	svr.Post("/submit-render", mw.wrap_endpoint("/submit-render", submit_render));
 
