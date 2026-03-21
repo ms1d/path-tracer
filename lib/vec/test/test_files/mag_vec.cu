@@ -2,6 +2,8 @@
 #include "../test_runner.h"
 #include <cassert>
 
+
+
 template<size_t dim>
 __global__ void mag_vec_kernel(const vec<dim> *v1, float *mag) {
 	*mag = v1->mag();
@@ -19,7 +21,7 @@ void mag_vec_cu() {
 
 	mag_vec_kernel<<<1, 1>>>(v1, mag);
 	cudaDeviceSynchronize();
-	
+
 	float sum = 0;
 	for (size_t i = 0; i < dim; i++) sum += v1->data[i] * v1->data[i];
 	sum = __builtin_sqrtf(sum);
@@ -29,6 +31,8 @@ void mag_vec_cu() {
 	cudaFree(v1);
 	cudaFree(mag);
 }
+
+
 
 template<size_t dim>
 void mag_vec_cpp() {
@@ -41,6 +45,8 @@ void mag_vec_cpp() {
 
 	assert(math_precision::nearly_equal(sum, mag));
 }
+
+
 
 template<size_t dim>
 struct mag_vec {
@@ -58,6 +64,8 @@ struct mag_vec {
 		assert(math_precision::nearly_equal(v.mag(), __builtin_sqrtf(14)));
 	}
 };
+
+
 
 int main() {
 	run_tests<mag_vec, 2, 64>();

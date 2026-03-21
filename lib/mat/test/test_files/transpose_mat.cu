@@ -21,8 +21,8 @@ void transpose_mat_cu() {
 	transpose_mat_kernel<<<1,1>>>(m, res);
 	cudaDeviceSynchronize();
 
-	for (int i = 0; i < r; i++) {
-		for (int j = 0; j < c; j++) {
+	for (size_t i = 0; i < r; i++) {
+		for (size_t j = 0; j < c; j++) {
 			assert(m->data[i][j] == res->data[j][i]);
 		}
 	}
@@ -36,8 +36,8 @@ void transpose_mat_cpp() {
 	mat<r,c> m = init_mat<r,c>();
 	mat<c,r> res = m.transpose();
 	
-	for (int i = 0; i < r; i++) {
-		for (int j = 0; j < c; j++) {
+	for (size_t i = 0; i < r; i++) {
+		for (size_t j = 0; j < c; j++) {
 			assert(m.data[i][j] == res.data[j][i]);
 		}
 	}
@@ -58,8 +58,8 @@ struct transpose_mat {
 		mat<3,2> m;
 		mat<2,3> res;
 
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 2; j++) {
+		for (size_t i = 0; i < 3; i++) {
+			for (size_t j = 0; j < 2; j++) {
 				m.data[i][j] = 2 * i + j;
 			}
 		}

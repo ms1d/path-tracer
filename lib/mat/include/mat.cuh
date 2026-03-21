@@ -46,8 +46,8 @@ struct mat {
 
 
 	__host__ __device__ constexpr mat& operator+=(const mat& other) {
-		for (int i = 0; i < r; i++) {
-			for (int j = 0; j < c; j++) {
+		for (size_t i = 0; i < r; i++) {
+			for (size_t j = 0; j < c; j++) {
 				data[i][j] += other.data[i][j];
 			}
 		}
@@ -64,8 +64,8 @@ struct mat {
 
 
 	__host__ __device__ constexpr mat& operator-=(const mat& other) {
-		for (int i = 0; i < r; i++) {
-			for (int j = 0; j < c; j++) {
+		for (size_t i = 0; i < r; i++) {
+			for (size_t j = 0; j < c; j++) {
 				data[i][j] -= other.data[i][j];
 			}
 		}
@@ -81,15 +81,15 @@ struct mat {
 
 
 
-	__host__ __device__ constexpr mat<r-1, c-1> get_minor(int row, int col) const requires(r > 1 && c > 1) {
+	__host__ __device__ constexpr mat<r-1, c-1> get_minor(size_t row, size_t col) const requires(r > 1 && c > 1) {
 		mat<r-1,c-1> res;
-		int curr_row = 0;
+		size_t curr_row = 0;
 
-		for (int i = 0; i < r; i++) {
+		for (size_t i = 0; i < r; i++) {
 			if (i == row) continue;
-			int curr_col = 0;
+			size_t curr_col = 0;
 
-			for (int j = 0; j < c; j++) {
+			for (size_t j = 0; j < c; j++) {
 				if (j == col) continue;
 
 				res.data[curr_row][curr_col] = data[i][j];
@@ -110,7 +110,7 @@ struct mat {
 		float det = 0;
 
 		int sign = 1;
-		for (int j = 0; j < c; j++) {
+		for (size_t j = 0; j < c; j++) {
 			mat<r-1,c-1> minor = get_minor(0, j);
 			det += sign * data[0][j] * minor.det();
 			sign *= -1;
@@ -122,9 +122,11 @@ struct mat {
 
 
 	__host__ __device__ constexpr mat& transpose_inplace() requires(r == c) {
-		for (int i = 0; i < r; i++) {
-			for (int j = i+1; j < c; j++) {
-				std::swap(data[i][j], data[j][i]);
+		for (size_t i = 0; i < r; i++) {
+			for (size_t j = i+1; j < c; j++) {
+				float tmp = data[i][j];
+				data[i][j] = data[j][i];
+				data[j][i] = tmp;
 			}
 		}
 
@@ -136,8 +138,8 @@ struct mat {
 	__host__ __device__ constexpr mat<c,r> transpose() const {
 		mat<c,r> res;
 
-		for (int i = 0; i < c; i++) {
-			for (int j = 0; j < r; j++) {
+		for (size_t i = 0; i < c; i++) {
+			for (size_t j = 0; j < r; j++) {
 				res.data[i][j] = data[j][i];
 			}
 		}
@@ -148,8 +150,8 @@ struct mat {
 
 
 	__host__ __device__ constexpr mat& operator*=(float scalar) {
-		for (int i = 0; i < r; i++) {
-			for (int j = 0; j < c; j++) {
+		for (size_t i = 0; i < r; i++) {
+			for (size_t j = 0; j < c; j++) {
 				data[i][j] *= scalar;
 			}
 		}
@@ -181,8 +183,8 @@ struct mat {
 
 
 	__host__ __device__ constexpr bool operator==(const mat& other) const {
-		for (int i = 0; i < r; i++) {
-			for (int j = 0; j < c; j++) {
+		for (size_t i = 0; i < r; i++) {
+			for (size_t j = 0; j < c; j++) {
 				if (!math_precision::nearly_equal(data[i][j], other.data[i][j])) return false;
 			}
 		}

@@ -50,8 +50,8 @@ struct add_mat {
 	void add_mat_example() {
 		mat<3,3> m1, m2;
 
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
+		for (size_t i = 0; i < 3; i++) {
+			for (size_t j = 0; j < 3; j++) {
 				m1.data[i][j] = i + j;
 				m2.data[i][j] = i * j;
 			}

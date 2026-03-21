@@ -25,9 +25,9 @@ void transform_vector_cu() {
     cudaDeviceSynchronize();
 
 	vec<r> check_vec;
-	for (int i = 0; i < r; i++) {
+	for (size_t i = 0; i < r; i++) {
 		float sum = 0;
-		for (int j = 0; j < c; j++) {
+		for (size_t j = 0; j < c; j++) {
 			sum += v->data[j] * m->data[i][j];
 		}
 
@@ -49,9 +49,9 @@ void transform_vector_cpp() {
 	vec<r> res = m * v;
 
 	vec<r> check_vec;
-	for (int i = 0; i < r; i++) {
+	for (size_t i = 0; i < r; i++) {
 		float sum = 0;
-		for (int j = 0; j < c; j++) {
+		for (size_t j = 0; j < c; j++) {
 			sum += v.data[j] * m.data[i][j];
 		}
 
@@ -76,8 +76,8 @@ struct transform_vector {
 		mat<3,3> m;
 		const vec<3> v{0, 1, 2};
 
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
+		for (size_t i = 0; i < 3; i++) {
+			for (size_t j = 0; j < 3; j++) {
 				m.data[i][j] = i + j;
 			}
 		}

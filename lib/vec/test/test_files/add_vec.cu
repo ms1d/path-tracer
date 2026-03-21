@@ -22,7 +22,7 @@ void add_vec_cu() {
 	cudaDeviceSynchronize();
 
 	vec<dim> check_vec;
-	for (int i = 0; i < dim; i++) {
+	for (size_t i = 0; i < dim; i++) {
 		check_vec.data[i] = v1->data[i] + v2->data[i];
 	}
 
@@ -40,7 +40,7 @@ void add_vec_cpp() {
 	vec<dim> res = v1 + v2;
 	
 	vec<dim> check_vec;
-	for (int i = 0; i < dim; i++) {
+	for (size_t i = 0; i < dim; i++) {
 		check_vec.data[i] = v1.data[i] + v2.data[i];
 	}
 

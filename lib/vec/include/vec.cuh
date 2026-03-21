@@ -52,7 +52,7 @@ struct vec_base {
 
 
 
-	__host__ __device__ constexpr float operator[](int i) const {
+	__host__ __device__ constexpr float operator[](size_t i) const {
 		return derived_data()[i];
 	}
 
@@ -67,10 +67,28 @@ struct vec_base {
 
 
 
+	__host__ __device__ constexpr Derived norm() const {
+		Derived res = static_cast<const Derived&>(*this);
+		res.norm_inplace();
+		return res;
+	}
+
+
+
+	__host__ __device__ constexpr Derived& norm_inplace() {
+		float magnitude = mag();
+		auto data = derived_data();
+		for (size_t i = 0; i < dim; i++) {
+			data[i] /= magnitude;
+		}
+		return static_cast<Derived&>(*this);
+	}
+
+
     __host__ __device__ constexpr Derived operator+(const Derived& other) const {
-        Derived v = static_cast<const Derived&>(*this);
-        v += other;
-        return v;
+        Derived res = static_cast<const Derived&>(*this);
+        res += other;
+        return res;
     }
     
 	__host__ __device__ constexpr Derived& operator+=(const Derived& other) {
@@ -237,8 +255,11 @@ struct vec<3> : vec_base<3, vec<3>> {
 	__host__ __device__ constexpr vec<3>& operator*=(float scalar) { return base::operator*=(scalar); }
 	__host__ __device__ constexpr vec<3> operator*(float scalar) const { return base::operator*(scalar); }
 
-	__host__ __device__ constexpr float operator[](int i) const { return base::operator[](i); }
+	__host__ __device__ constexpr float operator[](size_t i) const { return base::operator[](i); }
 	__host__ __device__ constexpr float mag() const { return base::mag(); }
+
+	__host__ __device__ constexpr vec<3> norm() const { return base::norm(); }
+	__host__ __device__ constexpr vec<3> norm_inplace() { return base::norm_inplace(); }
 
 	__host__ __device__ constexpr bool operator==(const vec<3>& other) const { return base::operator==(other); }
 

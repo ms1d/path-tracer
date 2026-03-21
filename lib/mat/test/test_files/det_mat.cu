@@ -51,8 +51,8 @@ struct det_mat {
 	void det_mat_example() {
 		mat<3,3> m;
 
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
+		for (size_t i = 0; i < 3; i++) {
+			for (size_t j = 0; j < 3; j++) {
 				m.data[i][j] = i + j;
 			}
 		}

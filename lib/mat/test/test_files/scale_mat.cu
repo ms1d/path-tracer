@@ -23,8 +23,8 @@ void scale_mat_cu() {
 	cudaDeviceSynchronize();
 	
 	mat<r,c> check_mat;
-	for (int i = 0; i < r; i++) {
-		for (int j = 0; j < c; j++) {
+	for (size_t i = 0; i < r; i++) {
+		for (size_t j = 0; j < c; j++) {
 			check_mat.data[i][j] = m->data[i][j] * *scalar;
 		}
 	}
@@ -44,8 +44,8 @@ void scale_mat_cpp() {
 	mat<r,c> res = m * scalar;
 
 	mat<r,c> check_mat;
-	for (int i = 0; i < r; i++) {
-		for (int j = 0; j < c; j++) {
+	for (size_t i = 0; i < r; i++) {
+		for (size_t j = 0; j < c; j++) {
 			check_mat.data[i][j] = m.data[i][j] * scalar;
 		}
 	}
@@ -68,8 +68,8 @@ struct scale_mat {
         mat<3,3> m;
         constexpr float scalar = 2.0f;
 
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
+		for (size_t i = 0; i < 3; i++) {
+			for (size_t j = 0; j < 3; j++) {
 				m.data[i][j] = i + j;
 			}
 		}

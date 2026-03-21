@@ -25,11 +25,11 @@ void mult_mat_cu() {
 
 	mat<r1,c2> check_mat;
 
-	for (int i = 0; i < r1; i++) {
-		for (int j = 0; j < c2; j++) {
+	for (size_t i = 0; i < r1; i++) {
+		for (size_t j = 0; j < c2; j++) {
 			float sum = 0;
 
-			for (int k = 0; k < c1; k++) {
+			for (size_t k = 0; k < c1; k++) {
 				sum += m1->data[i][k] * m2->data[k][j];
 			}
 
@@ -51,11 +51,11 @@ void mult_mat_cpp() {
 
 	mat<r1,c2> res = m1 * m2, check_mat;
 
-	for (int i = 0; i < r1; i++) {
-		for (int j = 0; j < c2; j++) {
+	for (size_t i = 0; i < r1; i++) {
+		for (size_t j = 0; j < c2; j++) {
 			float sum = 0;
 
-			for (int k = 0; k < c1; k++) {
+			for (size_t k = 0; k < c1; k++) {
 				sum += m1.data[i][k] * m2.data[k][j];
 			}
 
@@ -83,8 +83,8 @@ struct mult_mat {
 	void mult_mat_example() {
 		mat<3,3> m1, m2;
 
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
+		for (size_t i = 0; i < 3; i++) {
+			for (size_t j = 0; j < 3; j++) {
 				m1.data[i][j] = i + j;
 				m2.data[i][j] = i * j;
 			}
