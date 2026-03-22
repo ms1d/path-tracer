@@ -5,23 +5,23 @@
 A CUDA C++ path tracer server as a personal project.
 See also `ms1d/PathTracerApi` and `ms1d/path-tracer-react`.
 
-## Program flow
+## Architecture
 
-1. Input (JSON) containing tris, verts, materials and other scene data via tcp
+- Master process - manages 3 child processes (UDP, HTTP, Path Tracer)
 
-2. Start async cuda render job (path tracing)
+- HTTP - accepts standard REST API requests (health check, submit render)
 
-3. As pixels finish, send them over a udp connection indexed by frame number & position
+- UDP - sets up UDP connections with incoming TCP clients and streams pixel outputs
 
-4. Client can handle the pixels received
+- Path Tracer - powered by cuda to run on the GPU; solves the Rendering Equation
 
 ## Current Build Instructions
 
 - Configuration: `cmake --preset <preset name>`. See CMakePresets.json for presets
 
-- Build: `ninja -C build`
+- Build: `cmake --build --preset <preset name>`
 
-- Test: `cd build && ctest` from project root
+- Test: `cd build/<preset name> && ctest` from project root
 
 ## Stack
 
